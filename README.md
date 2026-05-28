@@ -28,6 +28,20 @@ Avalia 4 algoritmos recursivos (Mergesort, Quicksort, BFS e SSSP) nas APIs OpenM
 | GTX 1650 | Desktop GPU entrada |
 | Jetson AGX Orin | Edge AI SoM |
 | RTX 4090 | Desktop GPU topo |
+| MX350 | Desenvolvimento e validação local |
+
+## Configuração do Ambiente de Desenvolvimento
+
+Cada colaborador deve configurar seu próprio ambiente local seguindo
+as convenções do projeto:
+
+- Compilador C com suporte a OpenMP (`gcc` com flag `-fopenmp`)
+- CUDA Toolkit compatível com a GPU local
+- `make` para automação de build
+- Seguir o fluxo Git do projeto: `feature/xxx` -> `main`
+
+Consulte os `Makefile`s em cada diretório de algoritmo/API para os
+comandos de compilação e execução.
 
 ## Status
 

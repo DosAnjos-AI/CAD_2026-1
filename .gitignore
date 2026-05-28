@@ -1,0 +1,51 @@
+# --- Binários compilados ---
+*.o
+*.out
+*.a
+*.so
+*.exe
+
+# --- Diretórios de build ---
+build/
+bin/
+obj/
+
+# --- Arquivos intermediários nvcc / PTX ---
+*.ptx
+*.cubin
+*.fatbin
+*.i
+*.ii
+*.gpu
+*.cudafe1.cpp
+*.cudafe1.gpu
+*.cudafe2.gpu
+
+# --- Profiling e relatórios nvprof/nsight ---
+*.nvvp
+*.qdrep
+*.sqlite
+*.nsys-rep
+*.ncu-rep
+
+# --- Arquivos de sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Configuração de agentes de IA ---
+CLAUDE.md
+claude.md
+CLAUDE/
+.claude/
+.cursor/
+.aider*
+.copilot/
+*.agent.md
