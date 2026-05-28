@@ -35,13 +35,14 @@ Avalia 4 algoritmos recursivos (Mergesort, Quicksort, BFS e SSSP) nas APIs OpenM
 Cada colaborador deve configurar seu próprio ambiente local seguindo
 as convenções do projeto:
 
-- Compilador C com suporte a OpenMP (`gcc` com flag `-fopenmp`)
+- Compilador C com suporte a OpenMP (gcc com flag -fopenmp)
 - CUDA Toolkit compatível com a GPU local
-- `make` para automação de build
-- Seguir o fluxo Git do projeto: `feature/xxx` -> `main`
+- Host compiler compatível com a versão do CUDA Toolkit utilizada
+- make para automação de build
+- Seguir o fluxo Git do projeto: feature/xxx -> main
 
-Consulte os `Makefile`s em cada diretório de algoritmo/API para os
-comandos de compilação e execução.
+Consulte os Makefiles em cada diretório de algoritmo/API para os
+comandos de compilação e execução específicos.
 
 ## Status
 
