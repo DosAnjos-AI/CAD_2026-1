@@ -1,2 +1,38 @@
-# CAD_2026-1
-Replicação e extensão dos experimentos de Nogueira et al. (SSCAD 2024) com algoritmos recursivos em OpenMP, CUDA e CUDA DP. Avaliação em GTX 1650, Jetson AGX Orin e RTX 4090 com análise estatística aprimorada.
+# Replicação e Extensão — Nogueira et al. (SSCAD 2024)
+
+Replicação e extensão dos experimentos do artigo *"Análise de Desempenho e Consumo Energético de Aplicações Recursivas em Ambientes OpenMP, CUDA e CUDA DP"* (Nogueira et al., SSCAD 2024).
+
+## Sobre o artigo original
+
+Avalia 4 algoritmos recursivos (Mergesort, Quicksort, BFS e SSSP) nas APIs OpenMP, CUDA e CUDA DP, medindo tempo de execução e consumo de energia (CPU + GPU) em uma máquina com AMD Ryzen 9 3900X e GeForce GTX 1050.
+
+## O que este repositório adiciona
+
+- Replicação dos benchmarks originais nos mesmos algoritmos e APIs
+- Execução em novos ambientes de hardware: **GTX 1650**, **Jetson AGX Orin** e **RTX 4090**
+- Análise estatística aprimorada em relação ao artigo original
+
+## Algoritmos
+
+| Algoritmo | Tipo |
+|-----------|------|
+| Mergesort | Ordenação vetorial |
+| Quicksort | Ordenação vetorial |
+| BFS | Busca em grafos |
+| SSSP | Busca em grafos |
+
+## Hardware avaliado
+
+| Hardware | Contexto |
+|----------|----------|
+| GTX 1650 | Desktop GPU entrada |
+| Jetson AGX Orin | Edge AI SoM |
+| RTX 4090 | Desktop GPU topo |
+
+## Status
+
+> Em desenvolvimento — scripts ainda não implementados.
+
+## Referência
+
+Nogueira, A. G. D., Lorenzon, A. F., Schepke, C., Kreutz, D. *Análise de Desempenho e Consumo Energético de Aplicações Recursivas em Ambientes OpenMP, CUDA e CUDA DP*. SSCAD 2024, São Carlos/SP, pp. 264–275.
