@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -79,9 +80,39 @@ static int validar_bfs(int N, unsigned int *distance) {
     return 1;
 }
 
+/* Executa o laço BFS sobre os buffers de fila fornecidos */
+static void executar_bfs(int N, int *d_adj, int *d_offset, int *d_size,
+                          unsigned int *d_distance, int *d_parent,
+                          int *d_qa, int *d_qb, int *d_nextQueueSize) {
+    unsigned int zero_dist = 0;
+    int no_origem = 0;
+
+    cudaMemset(d_distance, 0xFF, N * sizeof(unsigned int));
+    cudaMemcpy(d_distance, &zero_dist, sizeof(unsigned int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_qa, &no_origem, sizeof(int), cudaMemcpyHostToDevice);
+
+    int *curQ = d_qa, *nxtQ = d_qb;
+    int nivel = 0, queueSize = 1, nextQueueSize = 0;
+
+    while (queueSize > 0) {
+        cudaMemset(d_nextQueueSize, 0, sizeof(int));
+        int num_blocos = (queueSize + 255) / 256;
+        kernel_bfs<<<num_blocos, 256>>>(
+            nivel, d_adj, d_offset, d_size,
+            d_distance, d_parent,
+            queueSize, d_nextQueueSize, curQ, nxtQ
+        );
+        cudaDeviceSynchronize();
+        cudaMemcpy(&nextQueueSize, d_nextQueueSize, sizeof(int), cudaMemcpyDeviceToHost);
+        int *tmp = curQ; curQ = nxtQ; nxtQ = tmp;
+        queueSize = nextQueueSize;
+        nivel++;
+    }
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s N M\n", argv[0]);
+        fprintf(stderr, "Uso: %s N M [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -90,6 +121,12 @@ int main(int argc, char *argv[]) {
     if (N <= 0 || M <= 0) {
         fprintf(stderr, "N e M devem ser inteiros positivos\n");
         return 1;
+    }
+
+    int runs = 10000;
+    for (int i = 3; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
     }
 
     /* Alocações no host */
@@ -109,70 +146,42 @@ int main(int argc, char *argv[]) {
     /* Alocações na GPU */
     int          *d_adj, *d_offset, *d_size, *d_parent;
     unsigned int *d_distance;
-    int          *d_currentQueue, *d_nextQueue, *d_nextQueueSize;
+    int          *d_qa, *d_qb, *d_nextQueueSize;
 
     cudaMalloc((void **)&d_adj,           M       * sizeof(int));
     cudaMalloc((void **)&d_offset,        (N + 1) * sizeof(int));
     cudaMalloc((void **)&d_size,          N       * sizeof(int));
     cudaMalloc((void **)&d_distance,      N       * sizeof(unsigned int));
     cudaMalloc((void **)&d_parent,        N       * sizeof(int));
-    cudaMalloc((void **)&d_currentQueue,  N       * sizeof(int));
-    cudaMalloc((void **)&d_nextQueue,     N       * sizeof(int));
+    cudaMalloc((void **)&d_qa,            N       * sizeof(int));
+    cudaMalloc((void **)&d_qb,            N       * sizeof(int));
     cudaMalloc((void **)&d_nextQueueSize, sizeof(int));
 
-    /* Inicializa distâncias com sentinela e zera o nó de origem */
-    cudaMemset(d_distance, 0xFF, N * sizeof(unsigned int));
-    unsigned int zero_dist = 0;
-    cudaMemcpy(d_distance, &zero_dist, sizeof(unsigned int), cudaMemcpyHostToDevice);
-
-    /* Fila inicial: apenas o nó 0 */
-    int no_origem = 0;
-    cudaMemcpy(d_currentQueue, &no_origem, sizeof(int), cudaMemcpyHostToDevice);
-
-    struct timeval inicio, fim;
-    gettimeofday(&inicio, NULL);
-
-    /* Transfere grafo para a GPU */
+    /* Transfere grafo para a GPU uma vez — somente-leitura nos kernels */
     cudaMemcpy(d_adj,    h_adj,    M       * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_offset, h_offset, (N + 1) * sizeof(int), cudaMemcpyHostToDevice);
     cudaMemcpy(d_size,   h_size,   N       * sizeof(int), cudaMemcpyHostToDevice);
 
-    int nivel         = 0;
-    int queueSize     = 1;
-    int nextQueueSize = 0;
+    /* warm-up: reseta estado e executa BFS completo para validar */
+    executar_bfs(N, d_adj, d_offset, d_size, d_distance, d_parent,
+                 d_qa, d_qb, d_nextQueueSize);
+    cudaMemcpy(h_distance, d_distance, N * sizeof(unsigned int), cudaMemcpyDeviceToHost);
+    const char *corretude = validar_bfs(N, h_distance) ? "OK" : "ERRO";
 
-    while (queueSize > 0) {
-        cudaMemset(d_nextQueueSize, 0, sizeof(int));
-        int num_blocos = (queueSize + 255) / 256;
-        kernel_bfs<<<num_blocos, 256>>>(
-            nivel, d_adj, d_offset, d_size,
-            d_distance, d_parent,
-            queueSize, d_nextQueueSize,
-            d_currentQueue, d_nextQueue
-        );
-        cudaDeviceSynchronize();
-        cudaMemcpy(&nextQueueSize, d_nextQueueSize, sizeof(int),
-                   cudaMemcpyDeviceToHost);
+    struct timeval inicio, fim;
+    gettimeofday(&inicio, NULL);
 
-        /* Alterna as filas */
-        int *tmp      = d_currentQueue;
-        d_currentQueue = d_nextQueue;
-        d_nextQueue    = tmp;
-
-        queueSize = nextQueueSize;
-        nivel++;
+    for (int r = 0; r < runs; r++) {
+        executar_bfs(N, d_adj, d_offset, d_size, d_distance, d_parent,
+                     d_qa, d_qb, d_nextQueueSize);
     }
-
-    cudaMemcpy(h_distance, d_distance, N * sizeof(unsigned int),
-               cudaMemcpyDeviceToHost);
 
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("bfs,cuda,%dx%d,%.6f,%s\n", N, M, tempo,
-           validar_bfs(N, h_distance) ? "OK" : "ERRO");
+    printf("bfs,cuda,%dx%d,%d,%.6f,%s\n", N, M, runs, tempo_total, corretude);
 
     free(h_adj);
     free(h_offset);
@@ -183,8 +192,8 @@ int main(int argc, char *argv[]) {
     cudaFree(d_size);
     cudaFree(d_distance);
     cudaFree(d_parent);
-    cudaFree(d_currentQueue);
-    cudaFree(d_nextQueue);
+    cudaFree(d_qa);
+    cudaFree(d_qb);
     cudaFree(d_nextQueueSize);
     return 0;
 }

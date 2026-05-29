@@ -94,7 +94,7 @@ static int validar_bfs(int N, int *distance) {
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s N M\n", argv[0]);
+        fprintf(stderr, "Uso: %s N M [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -103,6 +103,12 @@ int main(int argc, char *argv[]) {
     if (N <= 0 || M <= 0) {
         fprintf(stderr, "N e M devem ser inteiros positivos\n");
         return 1;
+    }
+
+    int runs = 10000;
+    for (int i = 3; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
     }
 
     int *adj      = malloc(M       * sizeof(int));
@@ -119,16 +125,22 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
     gerar_grafo(N, M, adj, offset, size);
 
+    /* warm-up: bfs_omp reinicializa distance/parent internamente */
+    bfs_omp(N, adj, offset, size, distance, parent);
+    const char *corretude = validar_bfs(N, distance) ? "OK" : "ERRO";
+
     struct timeval inicio, fim;
     gettimeofday(&inicio, NULL);
-    bfs_omp(N, adj, offset, size, distance, parent);
+
+    for (int r = 0; r < runs; r++)
+        bfs_omp(N, adj, offset, size, distance, parent);
+
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("bfs,openmp,%dx%d,%.6f,%s\n", N, M, tempo,
-           validar_bfs(N, distance) ? "OK" : "ERRO");
+    printf("bfs,openmp,%dx%d,%d,%.6f,%s\n", N, M, runs, tempo_total, corretude);
 
     free(adj);
     free(offset);

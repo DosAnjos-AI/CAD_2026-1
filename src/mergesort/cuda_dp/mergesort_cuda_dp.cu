@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -119,7 +120,7 @@ int validar_ordenacao(int *v, int n) {
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Uso: %s N\n", argv[0]);
+        fprintf(stderr, "Uso: %s N [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -129,47 +130,67 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int *h_v = (int *)malloc(n * sizeof(int));
-    if (!h_v) {
+    int runs = 10000;
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
+    }
+
+    int *h_original = (int *)malloc(n * sizeof(int));
+    int *h_v        = (int *)malloc(n * sizeof(int));
+    if (!h_original || !h_v) {
         fprintf(stderr, "Erro ao alocar memoria no host\n");
+        free(h_original); free(h_v);
         return 1;
     }
 
-    int *d_src, *d_dst;
-    cudaMalloc((void **)&d_src, n * sizeof(int));
-    cudaMalloc((void **)&d_dst, n * sizeof(int));
+    /* d_a e d_b: buffers permanentes alternados no sort bottom-up */
+    int *d_a, *d_b;
+    cudaMalloc((void **)&d_a, n * sizeof(int));
+    cudaMalloc((void **)&d_b, n * sizeof(int));
 
-    gerar_vetor(h_v, n);
+    gerar_vetor(h_original, n);
+
+    /* warm-up: inclui transferência H→D, kernels DP e D→H para validar */
+    {
+        int *src = d_a, *dst = d_b;
+        cudaMemcpy(src, h_original, n * sizeof(int), cudaMemcpyHostToDevice);
+        for (int largura = 1; largura < n; largura *= 2) {
+            int num_threads = (n + largura * 2 - 1) / (largura * 2);
+            int num_blocos  = (num_threads + THREADS_POR_BLOCO - 1) / THREADS_POR_BLOCO;
+            kernel_mergesort_dp<<<num_blocos, THREADS_POR_BLOCO>>>(src, dst, n, largura);
+            cudaDeviceSynchronize();
+            int *tmp = src; src = dst; dst = tmp;
+        }
+        cudaMemcpy(h_v, src, n * sizeof(int), cudaMemcpyDeviceToHost);
+    }
+    const char *corretude = validar_ordenacao(h_v, n) ? "OK" : "ERRO";
 
     struct timeval inicio, fim;
     gettimeofday(&inicio, NULL);
 
-    cudaMemcpy(d_src, h_v, n * sizeof(int), cudaMemcpyHostToDevice);
-
-    /* Laço bottom-up: dobra a largura a cada iteração */
-    for (int largura = 1; largura < n; largura *= 2) {
-        int num_threads = (n + largura * 2 - 1) / (largura * 2);
-        int num_blocos  = (num_threads + THREADS_POR_BLOCO - 1) / THREADS_POR_BLOCO;
-        kernel_mergesort_dp<<<num_blocos, THREADS_POR_BLOCO>>>(d_src, d_dst, n, largura);
-        cudaDeviceSynchronize();
-        /* Resultado em d_dst — swap coloca em d_src para a próxima iteração */
-        int *tmp = d_src;
-        d_src    = d_dst;
-        d_dst    = tmp;
+    for (int r = 0; r < runs; r++) {
+        int *src = d_a, *dst = d_b;
+        cudaMemcpy(src, h_original, n * sizeof(int), cudaMemcpyHostToDevice);
+        for (int largura = 1; largura < n; largura *= 2) {
+            int num_threads = (n + largura * 2 - 1) / (largura * 2);
+            int num_blocos  = (num_threads + THREADS_POR_BLOCO - 1) / THREADS_POR_BLOCO;
+            kernel_mergesort_dp<<<num_blocos, THREADS_POR_BLOCO>>>(src, dst, n, largura);
+            cudaDeviceSynchronize();
+            int *tmp = src; src = dst; dst = tmp;
+        }
+        /* corretude validada no warm-up — sem D→H a cada run */
     }
-
-    cudaMemcpy(h_v, d_src, n * sizeof(int), cudaMemcpyDeviceToHost);
 
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("mergesort,cuda_dp,%d,%.6f,%s\n", n, tempo,
-           validar_ordenacao(h_v, n) ? "OK" : "ERRO");
+    printf("mergesort,cuda_dp,%d,%d,%.6f,%s\n", n, runs, tempo_total, corretude);
 
-    free(h_v);
-    cudaFree(d_src);
-    cudaFree(d_dst);
+    free(h_original); free(h_v);
+    cudaFree(d_a);
+    cudaFree(d_b);
     return 0;
 }

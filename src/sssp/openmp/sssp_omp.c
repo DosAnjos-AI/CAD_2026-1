@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 #include <time.h>
 #include <sys/time.h>
@@ -72,7 +73,7 @@ static int validar_sssp(int N, int *dist) {
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        fprintf(stderr, "Uso: %s N M\n", argv[0]);
+        fprintf(stderr, "Uso: %s N M [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -81,6 +82,12 @@ int main(int argc, char *argv[]) {
     if (N <= 0 || M <= 0) {
         fprintf(stderr, "N e M devem ser inteiros positivos\n");
         return 1;
+    }
+
+    int runs = 10000;
+    for (int i = 3; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
     }
 
     int *origem  = malloc(M * sizeof(int));
@@ -97,16 +104,22 @@ int main(int argc, char *argv[]) {
     srand(time(NULL));
     gerar_grafo_ponderado(N, M, origem, destino, custo);
 
+    /* warm-up: sssp_omp reinicializa dist/preNode internamente */
+    sssp_omp(N, M, origem, destino, custo, dist, preNode);
+    const char *corretude = validar_sssp(N, dist) ? "OK" : "ERRO";
+
     struct timeval inicio, fim;
     gettimeofday(&inicio, NULL);
-    sssp_omp(N, M, origem, destino, custo, dist, preNode);
+
+    for (int r = 0; r < runs; r++)
+        sssp_omp(N, M, origem, destino, custo, dist, preNode);
+
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("sssp,openmp,%dx%d,%.6f,%s\n", N, M, tempo,
-           validar_sssp(N, dist) ? "OK" : "ERRO");
+    printf("sssp,openmp,%dx%d,%d,%.6f,%s\n", N, M, runs, tempo_total, corretude);
 
     free(origem);
     free(destino);

@@ -4,6 +4,7 @@ set -euo pipefail
 # ======================================================
 # CONFIGURAÇÃO — editar antes de executar
 # Opções de HARDWARE: mx350 | rtx4090 | jetson_agx_orin
+# Requer: sudo (para perf energy-pkg e tegrastats no Jetson)
 # ======================================================
 HARDWARE="${HARDWARE:-mx350}"
 ITERACOES="${ITERACOES:-10}"
@@ -72,13 +73,14 @@ POWER_PID=""
 TEGRA_PID=""
 POWER_LOG="/tmp/power_$$.log"
 TEGRA_LOG="/tmp/tegrastats_$$.log"
+PERF_LOG="/tmp/perf_$$.log"
 
 cleanup() {
     [ -n "$POWER_PID" ] && kill "$POWER_PID" 2>/dev/null || true
     [ -n "$TEGRA_PID" ] && kill "$TEGRA_PID" 2>/dev/null || true
     wait "$POWER_PID" 2>/dev/null || true
     wait "$TEGRA_PID" 2>/dev/null || true
-    rm -f "$POWER_LOG" "$TEGRA_LOG" "/tmp/make_err_$$.log"
+    rm -f "$POWER_LOG" "$TEGRA_LOG" "$PERF_LOG" "/tmp/make_err_$$.log"
 }
 trap cleanup EXIT INT TERM
 
@@ -120,46 +122,6 @@ compilar() {
     esac
     echo "OK"
 }
-
-# Modo de teste: compila e executa apenas mergesort/openmp/N=100, 1 iteração
-# Uso: TEST_MODE=1 bash scripts/run_benchmarks.sh
-if [ "${TEST_MODE:-0}" = "1" ]; then
-    echo "=== Modo de teste: mergesort/openmp/N=100, 1 iteração ==="
-    compilar mergesort openmp
-    [ -x "src/mergesort/openmp/mergesort_omp" ] || {
-        echo "ERRO: binário não encontrado"
-        exit 1
-    }
-    ITERACOES=1
-    csv="${RESULTS_DIR}/mergesort_openmp.csv"
-    rm -f "$csv"
-    echo "algoritmo,api,hardware,tamanho,iteracao,tempo_total_s,energia_gpu_j,energia_cpu_j,corretude" > "$csv"
-    > "$POWER_LOG"; > "$TEGRA_LOG"
-    if [ "$COLETA_ENERGIA" = "nvidia_smi" ]; then
-        nvidia-smi --query-gpu=power.draw \
-            --format=csv,noheader,nounits -l 1 >> "$POWER_LOG" 2>/dev/null &
-        POWER_PID=$!
-    fi
-    output=$(src/mergesort/openmp/mergesort_omp 100 --runs "$RUNS" 2>/dev/null) \
-        || output="mergesort,openmp,100,${RUNS},0,ERRO"
-    [ -n "$POWER_PID" ] && { kill "$POWER_PID" 2>/dev/null || true; wait "$POWER_PID" 2>/dev/null || true; POWER_PID=""; }
-    tempo_total_s=$(echo "$output" | cut -d',' -f5)
-    corretude=$(echo "$output"     | cut -d',' -f6)
-    if [ "$COLETA_ENERGIA" = "nvidia_smi" ] && [ -s "$POWER_LOG" ]; then
-        energia_gpu_j=$(LC_NUMERIC=C awk -v t="$tempo_total_s" \
-            '{sum+=$1; n++} END{ if(n>0) printf "%.4f", (sum/n)*t; else print "N/A" }' \
-            "$POWER_LOG")
-    else
-        energia_gpu_j="N/A"
-    fi
-    echo "mergesort,openmp,${HARDWARE},100,1,${tempo_total_s},${energia_gpu_j},N/A,${corretude}" >> "$csv"
-    printf "[mergesort/openmp] N=100 runs=%s iter 1/1  tempo_total=%ss  energia_gpu=%sJ  cpu=N/A  %s\n" \
-        "$RUNS" "$tempo_total_s" "$energia_gpu_j" "$corretude"
-    echo ""
-    echo "=== Conteúdo de $csv ==="
-    cat "$csv"
-    exit 0
-fi
 
 # ======================================================
 # Compilar todos os 12 binários
@@ -205,33 +167,36 @@ echo "[limpeza] concluída"
 echo ""
 
 # ======================================================
-# Coleta de energia GPU (sem sudo — CPU = N/A)
+# Coleta de energia — Plano A (com sudo)
+# GPU: nvidia-smi em background
+# CPU (x86): sudo perf stat -e power/energy-pkg/ envolvendo a execução
+# Jetson: sudo tegrastats em background (GPU+CPU juntos)
 # ======================================================
-iniciar_coleta_energia() {
+iniciar_coleta_gpu() {
     if [ "$COLETA_ENERGIA" = "nvidia_smi" ]; then
         > "$POWER_LOG"
         nvidia-smi --query-gpu=power.draw \
             --format=csv,noheader,nounits -l 1 >> "$POWER_LOG" 2>/dev/null &
         POWER_PID=$!
-    else
+    elif [ "$COLETA_ENERGIA" = "tegrastats" ]; then
         if ! command -v tegrastats &>/dev/null; then
             echo "AVISO: tegrastats não encontrado — energia será N/A" >&2
             return
         fi
         > "$TEGRA_LOG"
-        tegrastats --interval 1000 >> "$TEGRA_LOG" 2>/dev/null &
+        sudo tegrastats --interval 1000 >> "$TEGRA_LOG" 2>/dev/null &
         TEGRA_PID=$!
     fi
 }
 
-parar_coleta_energia() {
+parar_coleta_gpu() {
     if [ -n "$POWER_PID" ]; then
         kill "$POWER_PID" 2>/dev/null || true
         wait "$POWER_PID" 2>/dev/null || true
         POWER_PID=""
     fi
     if [ -n "$TEGRA_PID" ]; then
-        kill "$TEGRA_PID" 2>/dev/null || true
+        sudo kill "$TEGRA_PID" 2>/dev/null || true
         wait "$TEGRA_PID" 2>/dev/null || true
         TEGRA_PID=""
     fi
@@ -248,18 +213,39 @@ calcular_energia_gpu() {
         [ -s "$TEGRA_LOG" ] || { echo "N/A"; return; }
         gawk -v t="$tempo_s" '
         {
-            gpu=0; cpu=0
+            gpu=0
             if (match($0, /VDD_GPU_SOC ([0-9]+)mW/, a)) gpu=a[1]
-            if (match($0, /VDD_CPU_CV ([0-9]+)mW/,  b)) cpu=b[1]
-            if (gpu>0 || cpu>0) { sum+=(gpu+cpu)/1000.0; n++ }
+            if (gpu>0) { sum+=gpu/1000.0; n++ }
         }
         END { if(n>0) printf "%.4f",(sum/n)*t; else print "N/A" }
         ' "$TEGRA_LOG"
     fi
 }
 
+# Extrai Joules do CPU do log do perf stat (linha: "X,XX Joules power/energy-pkg/")
+extrair_energia_cpu_perf() {
+    local log=$1
+    # perf stat imprime algo como: "12,34 Joules power/energy-pkg/"
+    local joules
+    joules=$(grep -oP '[\d,]+(?=\s+Joules\s+power/energy-pkg/)' "$log" 2>/dev/null | head -1 | tr ',' '.' || true)
+    [ -n "$joules" ] && echo "$joules" || echo "N/A"
+}
+
+extrair_energia_cpu_tegrastats() {
+    local tempo_s=$1
+    [ -s "$TEGRA_LOG" ] || { echo "N/A"; return; }
+    gawk -v t="$tempo_s" '
+    {
+        cpu=0
+        if (match($0, /VDD_CPU_CV ([0-9]+)mW/, b)) cpu=b[1]
+        if (cpu>0) { sum+=cpu/1000.0; n++ }
+    }
+    END { if(n>0) printf "%.4f",(sum/n)*t; else print "N/A" }
+    ' "$TEGRA_LOG"
+}
+
 # ======================================================
-# Execução de um benchmark
+# Execução de um benchmark com coleta completa de energia
 # ======================================================
 executar_benchmark() {
     local alg=$1 api=$2 label=$3
@@ -279,23 +265,37 @@ executar_benchmark() {
 
     local iter
     for iter in $(seq 1 "$ITERACOES"); do
-        > "$POWER_LOG"; > "$TEGRA_LOG"
+        > "$POWER_LOG"; > "$TEGRA_LOG"; > "$PERF_LOG"
 
-        iniciar_coleta_energia
-        # shellcheck disable=SC2086
-        output=$("$bin" $args --runs "$RUNS" 2>/dev/null) \
-            || output="${alg},${api},${label},${RUNS},0,ERRO"
-        parar_coleta_energia
+        iniciar_coleta_gpu
 
-        # Novo formato: algoritmo,api,tamanho,runs,tempo_total_s,corretude
-        tempo_total_s=$(echo "$output" | cut -d',' -f5)
-        corretude=$(echo "$output"     | cut -d',' -f6)
-        energia_gpu_j=$(calcular_energia_gpu "${tempo_total_s:-0}")
+        if [ "$COLETA_ENERGIA" = "nvidia_smi" ]; then
+            # x86: usa perf stat para coleta de energia CPU
+            # shellcheck disable=SC2086
+            output=$(sudo perf stat -e power/energy-pkg/ \
+                "$bin" $args --runs "$RUNS" 2>"$PERF_LOG") \
+                || output="${alg},${api},${label},${RUNS},0,ERRO"
+            parar_coleta_gpu
+            tempo_total_s=$(echo "$output" | cut -d',' -f5)
+            corretude=$(echo "$output"     | cut -d',' -f6)
+            energia_gpu_j=$(calcular_energia_gpu "${tempo_total_s:-0}")
+            energia_cpu_j=$(extrair_energia_cpu_perf "$PERF_LOG")
+        else
+            # Jetson: tegrastats cobre GPU+CPU; não usa perf
+            # shellcheck disable=SC2086
+            output=$("$bin" $args --runs "$RUNS" 2>/dev/null) \
+                || output="${alg},${api},${label},${RUNS},0,ERRO"
+            parar_coleta_gpu
+            tempo_total_s=$(echo "$output" | cut -d',' -f5)
+            corretude=$(echo "$output"     | cut -d',' -f6)
+            energia_gpu_j=$(calcular_energia_gpu "${tempo_total_s:-0}")
+            energia_cpu_j=$(extrair_energia_cpu_tegrastats "${tempo_total_s:-0}")
+        fi
 
-        echo "${alg},${api},${HARDWARE},${label},${iter},${tempo_total_s:-0},${energia_gpu_j},N/A,${corretude}" >> "$csv"
-        printf "[%s/%s] N=%-18s runs=%s iter %2d/%d  tempo_total=%ss  gpu=%sJ  cpu=N/A  %s\n" \
+        echo "${alg},${api},${HARDWARE},${label},${iter},${tempo_total_s:-0},${energia_gpu_j},${energia_cpu_j},${corretude}" >> "$csv"
+        printf "[%s/%s] N=%-18s runs=%s iter %2d/%d  tempo_total=%ss  gpu=%sJ  cpu=%sJ  %s\n" \
             "$alg" "$api" "$label" "$RUNS" "$iter" "$ITERACOES" \
-            "${tempo_total_s:-?}" "${energia_gpu_j}" "${corretude:-?}"
+            "${tempo_total_s:-?}" "${energia_gpu_j}" "${energia_cpu_j}" "${corretude:-?}"
     done
 }
 
@@ -303,10 +303,9 @@ executar_benchmark() {
 # Loop principal de benchmarks
 # ======================================================
 echo "======================================"
-echo "Benchmark: $HARDWARE  |  SM=$SM_NUM"
+echo "Benchmark: $HARDWARE  |  SM=$SM_NUM  [MODO SUDO]"
 echo "Iterações: $ITERACOES  |  Runs internos: $RUNS"
 echo "Resultados: $RESULTS_DIR"
-echo "Nota: energia CPU = N/A (use run_benchmarks_sudo.sh para coleta com perf)"
 echo "======================================"
 echo ""
 
