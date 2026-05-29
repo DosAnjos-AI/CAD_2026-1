@@ -44,6 +44,32 @@ as convenções do projeto:
 Consulte os Makefiles em cada diretório de algoritmo/API para os
 comandos de compilação e execução específicos.
 
+## Formato de Saída e Coleta de Resultados
+
+Cada binário imprime uma linha CSV por execução no stdout:
+
+```
+algoritmo,api,tamanho,tempo_s,corretude
+mergesort,openmp,100000,0.079210,OK
+```
+
+Os scripts de benchmark redirecionam a saída em append para arquivos
+CSV em `results/<hardware>/`, um arquivo por combinação algoritmo/API:
+
+```
+results/
+  mx350/
+    mergesort_openmp.csv
+    mergesort_cuda.csv
+    mergesort_cuda_dp.csv
+    ...
+```
+
+Cada CSV acumula uma linha por execução. Com 10 iterações por tamanho,
+o arquivo final terá 30 linhas (3 tamanhos × 10 iterações) para
+algoritmos de ordenação, e 40 linhas (4 tamanhos × 10 iterações)
+para SSSP.
+
 ## Status
 
 > Em desenvolvimento — scripts ainda não implementados.
