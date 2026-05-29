@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 #include <omp.h>
@@ -89,7 +90,7 @@ int validar_ordenacao(int *v, int n) {
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Uso: %s N\n", argv[0]);
+        fprintf(stderr, "Uso: %s N [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -99,35 +100,51 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int *v   = malloc(n * sizeof(int));
-    int *tmp = malloc(n * sizeof(int));
-    if (!v || !tmp) {
+    int runs = 10000;
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
+    }
+
+    int *v_orig = malloc(n * sizeof(int));
+    int *v      = malloc(n * sizeof(int));
+    int *tmp    = malloc(n * sizeof(int));
+    if (!v_orig || !v || !tmp) {
         fprintf(stderr, "Erro ao alocar memoria\n");
-        free(v);
-        free(tmp);
+        free(v_orig); free(v); free(tmp);
         return 1;
     }
 
-    gerar_vetor(v, n);
+    gerar_vetor(v_orig, n);
 
-    struct timeval inicio, fim;
-    gettimeofday(&inicio, NULL);
-
+    /* warm-up: execução descartada para eliminar overhead de inicialização */
+    memcpy(v, v_orig, n * sizeof(int));
     #pragma omp parallel
     {
         #pragma omp single
         mergesort_omp(v, tmp, 0, n - 1);
     }
+    const char *corretude = validar_ordenacao(v, n) ? "OK" : "ERRO";
+
+    struct timeval inicio, fim;
+    gettimeofday(&inicio, NULL);
+
+    for (int r = 0; r < runs; r++) {
+        memcpy(v, v_orig, n * sizeof(int));
+        #pragma omp parallel
+        {
+            #pragma omp single
+            mergesort_omp(v, tmp, 0, n - 1);
+        }
+    }
 
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("mergesort,openmp,%d,%.6f,%s\n", n, tempo,
-           validar_ordenacao(v, n) ? "OK" : "ERRO");
+    printf("mergesort,openmp,%d,%d,%.6f,%s\n", n, runs, tempo_total, corretude);
 
-    free(v);
-    free(tmp);
+    free(v_orig); free(v); free(tmp);
     return 0;
 }

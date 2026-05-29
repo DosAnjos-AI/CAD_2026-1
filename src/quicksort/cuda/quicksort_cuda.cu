@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -89,7 +90,7 @@ int validar_ordenacao(int *v, int n) {
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Uso: %s N\n", argv[0]);
+        fprintf(stderr, "Uso: %s N [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -99,9 +100,17 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int *h_v = (int *)malloc(n * sizeof(int));
-    if (!h_v) {
+    int runs = 10000;
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
+    }
+
+    int *h_original = (int *)malloc(n * sizeof(int));
+    int *h_v        = (int *)malloc(n * sizeof(int));
+    if (!h_original || !h_v) {
         fprintf(stderr, "Erro ao alocar memoria no host\n");
+        free(h_original); free(h_v);
         return 1;
     }
 
@@ -117,51 +126,49 @@ int main(int argc, char *argv[]) {
     cudaMalloc((void **)&d_dir_b,    PILHA_MAX * sizeof(int));
     cudaMalloc((void **)&d_tam_prox, sizeof(int));
 
-    gerar_vetor(h_v, n);
+    gerar_vetor(h_original, n);
+
+    /* Executa um run completo do quicksort com reset da pilha */
+    #define EXECUTAR_RUN() do { \
+        int ini_esq = 0, ini_dir = n - 1; \
+        cudaMemcpy(d_v,     h_original, n * sizeof(int), cudaMemcpyHostToDevice); \
+        cudaMemcpy(d_esq_a, &ini_esq,   sizeof(int),     cudaMemcpyHostToDevice); \
+        cudaMemcpy(d_dir_a, &ini_dir,   sizeof(int),     cudaMemcpyHostToDevice); \
+        int *pe = d_esq_a, *pd = d_dir_a, *pe2 = d_esq_b, *pd2 = d_dir_b; \
+        int tam = 1, tam_p = 0; \
+        while (tam > 0) { \
+            cudaMemset(d_tam_prox, 0, sizeof(int)); \
+            int nb = (tam + 255) / 256; \
+            kernel_quicksort<<<nb, 256>>>(d_v, pe, pd, tam, pe2, pd2, d_tam_prox); \
+            cudaDeviceSynchronize(); \
+            cudaMemcpy(&tam_p, d_tam_prox, sizeof(int), cudaMemcpyDeviceToHost); \
+            tam = tam_p; \
+            int *t; t = pe; pe = pe2; pe2 = t; t = pd; pd = pd2; pd2 = t; \
+        } \
+    } while (0)
+
+    /* warm-up */
+    EXECUTAR_RUN();
+    cudaMemcpy(h_v, d_v, n * sizeof(int), cudaMemcpyDeviceToHost);
+    const char *corretude = validar_ordenacao(h_v, n) ? "OK" : "ERRO";
 
     struct timeval inicio, fim;
     gettimeofday(&inicio, NULL);
 
-    cudaMemcpy(d_v, h_v, n * sizeof(int), cudaMemcpyHostToDevice);
-
-    /* Inicializa pilha A com o subproblema completo [0, n-1] */
-    int ini_esq = 0, ini_dir = n - 1;
-    cudaMemcpy(d_esq_a, &ini_esq, sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_dir_a, &ini_dir, sizeof(int), cudaMemcpyHostToDevice);
-
-    int *pilha_esq_atual = d_esq_a, *pilha_dir_atual = d_dir_a;
-    int *pilha_esq_prox  = d_esq_b, *pilha_dir_prox  = d_dir_b;
-    int  tam_atual = 1;
-    int  tam_prox  = 0;
-
-    while (tam_atual > 0) {
-        cudaMemset(d_tam_prox, 0, sizeof(int));
-        int num_blocos = (tam_atual + 255) / 256;
-        kernel_quicksort<<<num_blocos, 256>>>(
-            d_v,
-            pilha_esq_atual, pilha_dir_atual, tam_atual,
-            pilha_esq_prox,  pilha_dir_prox,  d_tam_prox
-        );
-        cudaDeviceSynchronize();
-        cudaMemcpy(&tam_prox, d_tam_prox, sizeof(int), cudaMemcpyDeviceToHost);
-        tam_atual = tam_prox;
-        /* Alterna as pilhas: próxima torna-se atual na próxima iteração */
-        int *tmp;
-        tmp = pilha_esq_atual; pilha_esq_atual = pilha_esq_prox; pilha_esq_prox = tmp;
-        tmp = pilha_dir_atual; pilha_dir_atual = pilha_dir_prox; pilha_dir_prox = tmp;
+    for (int r = 0; r < runs; r++) {
+        EXECUTAR_RUN();
     }
-
-    cudaMemcpy(h_v, d_v, n * sizeof(int), cudaMemcpyDeviceToHost);
 
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    #undef EXECUTAR_RUN
 
-    printf("quicksort,cuda,%d,%.6f,%s\n", n, tempo,
-           validar_ordenacao(h_v, n) ? "OK" : "ERRO");
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    free(h_v);
+    printf("quicksort,cuda,%d,%d,%.6f,%s\n", n, runs, tempo_total, corretude);
+
+    free(h_original); free(h_v);
     cudaFree(d_v);
     cudaFree(d_esq_a);
     cudaFree(d_dir_a);

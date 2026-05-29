@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <sys/time.h>
 
@@ -85,7 +86,7 @@ int validar_ordenacao(int *v, int n) {
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fprintf(stderr, "Uso: %s N\n", argv[0]);
+        fprintf(stderr, "Uso: %s N [--runs N]\n", argv[0]);
         return 1;
     }
 
@@ -95,29 +96,51 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    int runs = 10000;
+    for (int i = 2; i < argc; i++) {
+        if (strcmp(argv[i], "--runs") == 0 && i + 1 < argc)
+            runs = atoi(argv[i + 1]);
+    }
+
     /* Memória unificada: acessível pela CPU e GPU sem cudaMemcpy */
     int *v;
     cudaMallocManaged((void **)&v, n * sizeof(int));
 
-    gerar_vetor(v, n);
+    int *h_original = (int *)malloc(n * sizeof(int));
+    if (!h_original) {
+        fprintf(stderr, "Erro ao alocar memoria no host\n");
+        cudaFree(v);
+        return 1;
+    }
+
+    gerar_vetor(h_original, n);
 
     /* Configura a profundidade máxima de sincronização do device runtime */
     cudaDeviceSetLimit(cudaLimitDevRuntimeSyncDepth, PROFUNDIDADE_MAX);
 
+    /* warm-up: memcpy para memória unificada, executa e valida */
+    memcpy(v, h_original, n * sizeof(int));
+    cdp_quicksort<<<1, 1>>>(v, 0, n - 1, 0);
+    cudaDeviceSynchronize();
+    const char *corretude = validar_ordenacao(v, n) ? "OK" : "ERRO";
+
     struct timeval inicio, fim;
     gettimeofday(&inicio, NULL);
 
-    cdp_quicksort<<<1, 1>>>(v, 0, n - 1, 0);
-    cudaDeviceSynchronize();
+    for (int r = 0; r < runs; r++) {
+        memcpy(v, h_original, n * sizeof(int));
+        cdp_quicksort<<<1, 1>>>(v, 0, n - 1, 0);
+        cudaDeviceSynchronize();
+    }
 
     gettimeofday(&fim, NULL);
 
-    double tempo = (fim.tv_sec  - inicio.tv_sec) +
-                   (fim.tv_usec - inicio.tv_usec) / 1e6;
+    double tempo_total = (fim.tv_sec  - inicio.tv_sec) +
+                         (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("quicksort,cuda_dp,%d,%.6f,%s\n", n, tempo,
-           validar_ordenacao(v, n) ? "OK" : "ERRO");
+    printf("quicksort,cuda_dp,%d,%d,%.6f,%s\n", n, runs, tempo_total, corretude);
 
+    free(h_original);
     cudaFree(v);
     return 0;
 }

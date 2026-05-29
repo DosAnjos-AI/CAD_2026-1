@@ -16,20 +16,61 @@ cd CAD_2026-1
 
 ## Configurar o hardware
 
-Editar a linha 10 de `scripts/run_benchmarks.sh`:
+Editar as variáveis no início do script escolhido:
 
 ```bash
 HARDWARE="mx350"   # opções: mx350 | rtx4090 | jetson_agx_orin
+ITERACOES=10       # número de repetições externas (linhas no CSV)
+RUNS=10000         # execuções internas por iteração
 ```
 
 ## Executar o benchmark completo
 
+**Sem sudo** (energia CPU registrada como N/A):
 ```bash
 bash scripts/run_benchmarks.sh
 ```
 
-O script compila todos os 12 binários, verifica os executáveis e
-inicia as execuções automaticamente.
+**Com sudo** (coleta energia CPU via `perf stat`):
+```bash
+sudo bash scripts/run_benchmarks_sudo.sh
+```
+
+Ambos os scripts compilam todos os 12 binários, verificam os executáveis
+e iniciam as execuções automaticamente.
+
+## Estrutura do Benchmark
+
+### Warm-up
+
+Cada binário executa **1 rodada de aquecimento** antes de medir o tempo.
+O warm-up elimina o overhead de inicialização do contexto CUDA, alocação
+de memória na GPU e cold-start de caches. Ele também é a execução usada
+para verificar a **corretude** do resultado.
+
+### Loop interno (--runs N)
+
+Após o warm-up, cada binário executa o algoritmo **N vezes consecutivas**
+dentro de um único intervalo `gettimeofday()`:
+
+```
+gettimeofday(&inicio)
+  for r in [0..N):
+    reinicializa dados (vetor embaralhado, distâncias zeradas, etc.)
+    executa o algoritmo
+gettimeofday(&fim)
+```
+
+O campo `tempo_total_s` no CSV é o tempo das **N execuções juntas**,
+não o tempo de uma única execução.
+
+Para obter o tempo médio por execução: `tempo_total_s / runs`.
+
+### Iterações externas (ITERACOES)
+
+O script externo repete cada configuração `ITERACOES` vezes, gerando
+múltiplas linhas no CSV. Isso permite calcular médias e desvios padrão
+entre as iterações.
 
 ## Onde ficam os resultados
 
@@ -42,18 +83,35 @@ results/<hardware>/
   ...
 ```
 
-Formato de cada linha:
+Formato de cada linha (9 campos):
 
 ```
-algoritmo,api,hardware,tamanho,iteracao,tempo_s,energia_j,corretude
-mergesort,openmp,mx350,100000,1,0.055302,12.45,OK
+algoritmo,api,hardware,tamanho,iteracao,tempo_total_s,energia_gpu_j,energia_cpu_j,corretude
+mergesort,openmp,mx350,100000,1,55.302000,N/A,12.45,OK
 ```
+
+| Campo | Descrição |
+|-------|-----------|
+| `tempo_total_s` | Tempo total das `runs` execuções internas (segundos) |
+| `energia_gpu_j` | Energia GPU estimada (nvidia-smi média × tempo) |
+| `energia_cpu_j` | Energia CPU (perf energy-pkg, apenas run_benchmarks_sudo.sh) |
+| `corretude` | OK ou ERRO — verificado no warm-up |
+
+## Diferença entre os dois scripts
+
+| Aspecto | `run_benchmarks.sh` | `run_benchmarks_sudo.sh` |
+|---------|--------------------|-----------------------|
+| Requer sudo | Não | Sim |
+| Energia CPU | N/A | `perf stat -e power/energy-pkg/` |
+| Energia GPU | nvidia-smi (GPUs discretas) | idem |
+| Jetson tegrastats | sem sudo | com sudo |
 
 ## Observações
 
-- **Jetson:** `tegrastats` pode exigir `sudo`. Se não estiver disponível,
-  energia é registrada como `N/A`.
-- **Execuções rápidas (< 1s):** energia registrada como `N/A` — resolução
-  do `nvidia-smi` é de 1 segundo.
+- **Execuções rápidas (< 1s):** energia GPU pode ser N/A — resolução
+  do `nvidia-smi` é de 1 segundo por amostra.
 - **Interrupção:** `Ctrl+C` encerra o script. Arquivos CSV gerados até
   o momento são mantidos.
+- **Teste rápido:** `TEST_MODE=1 RUNS=5 bash scripts/run_benchmarks.sh`
+  executa apenas mergesort/openmp/N=100 com 1 iteração para verificar
+  o ambiente sem rodar o benchmark completo.
