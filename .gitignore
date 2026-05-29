@@ -1,0 +1,65 @@
+# --- Binários compilados dos benchmarks ---
+src/mergesort/openmp/mergesort_omp
+src/mergesort/cuda/mergesort_cuda
+src/mergesort/cuda_dp/mergesort_cuda_dp
+src/quicksort/openmp/quicksort_omp
+src/quicksort/cuda/quicksort_cuda
+src/quicksort/cuda_dp/quicksort_cuda_dp
+src/bfs/openmp/bfs_omp
+src/bfs/cuda/bfs_cuda
+src/bfs/cuda_dp/bfs_cuda_dp
+src/sssp/openmp/sssp_omp
+src/sssp/cuda/sssp_cuda
+src/sssp/cuda_dp/sssp_cuda_dp
+
+# --- Binários compilados ---
+*.o
+*.out
+*.a
+*.so
+*.exe
+
+# --- Diretórios de build ---
+build/
+bin/
+obj/
+
+# --- Arquivos intermediários nvcc / PTX ---
+*.ptx
+*.cubin
+*.fatbin
+*.i
+*.ii
+*.gpu
+*.cudafe1.cpp
+*.cudafe1.gpu
+*.cudafe2.gpu
+
+# --- Profiling e relatórios nvprof/nsight ---
+*.nvvp
+*.qdrep
+*.sqlite
+*.nsys-rep
+*.ncu-rep
+
+# --- Arquivos de sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor / IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Configuração de agentes de IA ---
+CLAUDE.md
+claude.md
+CLAUDE/
+.claude/
+.cursor/
+.aider*
+.copilot/
+*.agent.md
