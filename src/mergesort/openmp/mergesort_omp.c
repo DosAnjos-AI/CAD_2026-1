@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
     double tempo = (fim.tv_sec  - inicio.tv_sec) +
                    (fim.tv_usec - inicio.tv_usec) / 1e6;
 
-    printf("Tempo: %.6f s\n", tempo);
-    printf("%s\n", validar_ordenacao(v, n) ? "OK" : "ERRO");
+    printf("mergesort,openmp,%d,%.6f,%s\n", n, tempo,
+           validar_ordenacao(v, n) ? "OK" : "ERRO");
 
     free(v);
     free(tmp);
