@@ -7,8 +7,7 @@ set -euo pipefail
 # ======================================================
 HARDWARE="${HARDWARE:-mx350}"
 ITERACOES="${ITERACOES:-10}"
-RUNS="${RUNS:-10000}"
-TIMEOUT="${TIMEOUT:-600}"   # segundos por execução do binário
+RUNS="${RUNS:-1500}"
 
 # Navega para o diretório raiz do repositório
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -61,6 +60,10 @@ CUDADP_FLAGS="${CUDA_FLAGS} -rdc=true -lcudadevrt -DCUDA_FORCE_CDP1_IF_SUPPORTED
 
 RESULTS_DIR="results/${HARDWARE}"
 mkdir -p "$RESULTS_DIR"
+
+# Redireciona stdout para terminal E arquivo de log simultaneamente
+LOG_FILE="${RESULTS_DIR}/benchmark_log.txt"
+exec 1> >(tee -a "$LOG_FILE")
 
 # ======================================================
 # Trap: limpeza em saída normal, erro ou Ctrl+C
@@ -137,7 +140,7 @@ if [ "${TEST_MODE:-0}" = "1" ]; then
             --format=csv,noheader,nounits -l 1 >> "$POWER_LOG" 2>/dev/null &
         POWER_PID=$!
     fi
-    output=$(timeout "$TIMEOUT" src/mergesort/openmp/mergesort_omp 100 --runs "$RUNS" 2>/dev/null) \
+    output=$(src/mergesort/openmp/mergesort_omp 100 --runs "$RUNS" 2>/dev/null) \
         || output="mergesort,openmp,100,${RUNS},0,ERRO"
     [ -n "$POWER_PID" ] && { kill "$POWER_PID" 2>/dev/null || true; wait "$POWER_PID" 2>/dev/null || true; POWER_PID=""; }
     tempo_total_s=$(echo "$output" | cut -d',' -f5)
@@ -193,6 +196,12 @@ for bin in "${BINARIOS[@]}"; do
     [ -x "$bin" ] || { echo "ERRO: binário não encontrado: $bin"; exit 1; }
 done
 echo "[ok] todos os 12 binários validados"
+echo ""
+
+# Limpa CSVs anteriores para evitar mistura com dados corretos
+echo "[limpeza] removendo CSVs anteriores em $RESULTS_DIR..."
+rm -f "${RESULTS_DIR}"/*.csv
+echo "[limpeza] concluída"
 echo ""
 
 # ======================================================
@@ -274,7 +283,7 @@ executar_benchmark() {
 
         iniciar_coleta_energia
         # shellcheck disable=SC2086
-        output=$(timeout "$TIMEOUT" "$bin" $args --runs "$RUNS" 2>/dev/null) \
+        output=$("$bin" $args --runs "$RUNS" 2>/dev/null) \
             || output="${alg},${api},${label},${RUNS},0,ERRO"
         parar_coleta_energia
 
@@ -295,7 +304,7 @@ executar_benchmark() {
 # ======================================================
 echo "======================================"
 echo "Benchmark: $HARDWARE  |  SM=$SM_NUM"
-echo "Iterações: $ITERACOES  |  Runs internos: $RUNS  |  Timeout: ${TIMEOUT}s"
+echo "Iterações: $ITERACOES  |  Runs internos: $RUNS"
 echo "Resultados: $RESULTS_DIR"
 echo "Nota: energia CPU = N/A (use run_benchmarks_sudo.sh para coleta com perf)"
 echo "======================================"

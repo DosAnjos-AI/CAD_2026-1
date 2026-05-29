@@ -8,8 +8,7 @@ set -euo pipefail
 # ======================================================
 HARDWARE="${HARDWARE:-mx350}"
 ITERACOES="${ITERACOES:-10}"
-RUNS="${RUNS:-10000}"
-TIMEOUT="${TIMEOUT:-600}"   # segundos por execução do binário
+RUNS="${RUNS:-1500}"
 
 # Navega para o diretório raiz do repositório
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -62,6 +61,10 @@ CUDADP_FLAGS="${CUDA_FLAGS} -rdc=true -lcudadevrt -DCUDA_FORCE_CDP1_IF_SUPPORTED
 
 RESULTS_DIR="results/${HARDWARE}"
 mkdir -p "$RESULTS_DIR"
+
+# Redireciona stdout para terminal E arquivo de log simultaneamente
+LOG_FILE="${RESULTS_DIR}/benchmark_log.txt"
+exec 1> >(tee -a "$LOG_FILE")
 
 # ======================================================
 # Trap: limpeza em saída normal, erro ou Ctrl+C
@@ -155,6 +158,12 @@ for bin in "${BINARIOS[@]}"; do
     [ -x "$bin" ] || { echo "ERRO: binário não encontrado: $bin"; exit 1; }
 done
 echo "[ok] todos os 12 binários validados"
+echo ""
+
+# Limpa CSVs anteriores para evitar mistura com dados corretos
+echo "[limpeza] removendo CSVs anteriores em $RESULTS_DIR..."
+rm -f "${RESULTS_DIR}"/*.csv
+echo "[limpeza] concluída"
 echo ""
 
 # ======================================================
@@ -264,7 +273,7 @@ executar_benchmark() {
             # x86: usa perf stat para coleta de energia CPU
             # shellcheck disable=SC2086
             output=$(sudo perf stat -e power/energy-pkg/ \
-                timeout "$TIMEOUT" "$bin" $args --runs "$RUNS" 2>"$PERF_LOG") \
+                "$bin" $args --runs "$RUNS" 2>"$PERF_LOG") \
                 || output="${alg},${api},${label},${RUNS},0,ERRO"
             parar_coleta_gpu
             tempo_total_s=$(echo "$output" | cut -d',' -f5)
@@ -274,7 +283,7 @@ executar_benchmark() {
         else
             # Jetson: tegrastats cobre GPU+CPU; não usa perf
             # shellcheck disable=SC2086
-            output=$(timeout "$TIMEOUT" "$bin" $args --runs "$RUNS" 2>/dev/null) \
+            output=$("$bin" $args --runs "$RUNS" 2>/dev/null) \
                 || output="${alg},${api},${label},${RUNS},0,ERRO"
             parar_coleta_gpu
             tempo_total_s=$(echo "$output" | cut -d',' -f5)
@@ -295,7 +304,7 @@ executar_benchmark() {
 # ======================================================
 echo "======================================"
 echo "Benchmark: $HARDWARE  |  SM=$SM_NUM  [MODO SUDO]"
-echo "Iterações: $ITERACOES  |  Runs internos: $RUNS  |  Timeout: ${TIMEOUT}s"
+echo "Iterações: $ITERACOES  |  Runs internos: $RUNS"
 echo "Resultados: $RESULTS_DIR"
 echo "======================================"
 echo ""
