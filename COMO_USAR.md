@@ -97,6 +97,37 @@ mergesort,openmp,mx350,100000,1,55.302000,N/A,12.45,OK
 | `energia_cpu_j` | Energia CPU (perf energy-pkg, apenas run_benchmarks_sudo.sh) |
 | `corretude` | OK ou ERRO — verificado no warm-up |
 
+## Configuração para coleta de energia CPU
+
+O `run_benchmarks_sudo.sh` usa `sudo perf stat -e power/energy-pkg/` para
+medir a energia da CPU. Em execuções em background (ex: `nohup`), o sudo
+suspende o processo ao pedir senha interativamente.
+
+Para evitar isso, configure o sudoers para permitir `perf` sem senha.
+Execute **uma vez em cada máquina**:
+
+```bash
+sudo visudo
+```
+
+Adicione a linha abaixo (substitua `SEU_USUARIO` pelo usuário da máquina):
+
+```
+SEU_USUARIO ALL=(ALL) NOPASSWD: /usr/bin/perf
+```
+
+Salve e feche. Para verificar se a configuração está correta:
+
+```bash
+sudo -n perf stat -e power/energy-pkg/ sleep 1
+```
+
+Se não retornar erro de senha, está configurado corretamente.
+
+> **Sem essa configuração:** use `run_benchmarks.sh` (Plano B).
+> O tempo e a energia GPU são coletados normalmente; apenas
+> `energia_cpu_j` ficará como `N/A`.
+
 ## Diferença entre os dois scripts
 
 | Aspecto | `run_benchmarks.sh` | `run_benchmarks_sudo.sh` |
