@@ -1,0 +1,54 @@
+sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+sudo: uma senha é necessária
+6-05 17:42:43] === Tamanho n=100 ===
+[2026-06-05 17:42:43] n=100 iteracao=1/5
+[2026-06-05 17:42:43] n=100 iter=1 tempo=0.005052s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:42:43] Aguardando 20s entre iteracoes...
+[2026-06-05 17:43:03] n=100 iteracao=2/5
+[2026-06-05 17:43:03] n=100 iter=2 tempo=0.005734s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:43:03] Aguardando 20s entre iteracoes...
+[2026-06-05 17:43:23] n=100 iteracao=3/5
+[2026-06-05 17:43:23] n=100 iter=3 tempo=0.005525s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:43:23] Aguardando 20s entre iteracoes...
+[2026-06-05 17:43:43] n=100 iteracao=4/5
+[2026-06-05 17:43:44] n=100 iter=4 tempo=0.005009s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:43:44] Aguardando 20s entre iteracoes...
+[2026-06-05 17:44:04] n=100 iteracao=5/5
+[2026-06-05 17:44:04] n=100 iter=5 tempo=0.006496s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:44:04] Aguardando 30s entre tamanhos...
+[2026-06-05 17:44:34] === Tamanho n=10000 ===
+[2026-06-05 17:44:34] n=10000 iteracao=1/5
+[2026-06-05 17:45:10] n=10000 iter=1 tempo=32.401020s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:45:10] Aguardando 20s entre iteracoes...
+[2026-06-05 17:45:30] n=10000 iteracao=2/5
+[2026-06-05 17:46:05] n=10000 iter=2 tempo=31.387076s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:46:05] Aguardando 20s entre iteracoes...
+[2026-06-05 17:46:25] n=10000 iteracao=3/5
+[2026-06-05 17:47:00] n=10000 iter=3 tempo=31.393742s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:47:00] Aguardando 20s entre iteracoes...
+[2026-06-05 17:47:20] n=10000 iteracao=4/5
+[2026-06-05 17:47:54] n=10000 iter=4 tempo=31.474487s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:47:54] Aguardando 20s entre iteracoes...
+[2026-06-05 17:48:14] n=10000 iteracao=5/5
+[2026-06-05 17:48:49] n=10000 iter=5 tempo=31.455901s energia_cpu=0.000000J corretude=OK
+[2026-06-05 17:48:49] Aguardando 30s entre tamanhos...
+[2026-06-05 17:49:19] === Tamanho n=100000 ===
+[2026-06-05 17:49:19] n=100000 iteracao=1/5
+[2026-06-05 18:46:10] n=100000 iter=1 tempo=3100.046197s energia_cpu=0.000000J corretude=OK
+[2026-06-05 18:46:10] Aguardando 20s entre iteracoes...
+[2026-06-05 18:46:30] n=100000 iteracao=2/5
+[2026-06-05 19:43:12] n=100000 iter=2 tempo=3092.883646s energia_cpu=0.000000J corretude=OK
+[2026-06-05 19:43:12] Aguardando 20s entre iteracoes...
+[2026-06-05 19:43:32] n=100000 iteracao=3/5
+[2026-06-05 20:40:28] n=100000 iter=3 tempo=3104.876727s energia_cpu=0.000000J corretude=OK
+[2026-06-05 20:40:28] Aguardando 20s entre iteracoes...
+[2026-06-05 20:40:48] n=100000 iteracao=4/5
+[2026-06-05 21:37:37] n=100000 iter=4 tempo=3099.319362s energia_cpu=0.000000J corretude=OK
+[2026-06-05 21:37:37] Aguardando 20s entre iteracoes...
+[2026-06-05 21:37:57] n=100000 iteracao=5/5
+[2026-06-05 22:34:47] n=100000 iter=5 tempo=3100.300403s energia_cpu=0.000000J corretude=OK
+[2026-06-05 22:34:47] Aguardando 30s entre tamanhos...
+[2026-06-05 22:35:17] === Tamanho n=1000000 ===
+[2026-06-05 22:35:17] n=1000000 iteracao=1/5
+[2026-06-05 22:35:17] === Tamanho n=1000000 ===
+[2026-06-05 22:35:17] n=1000000 iteracao=1/5

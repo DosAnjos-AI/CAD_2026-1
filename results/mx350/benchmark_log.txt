@@ -1,0 +1,437 @@
+======================================
+Compilando 12 binários para mx350
+======================================
+[compilando] mergesort/openmp     ... OK
+[compilando] mergesort/cuda       ... OK
+[compilando] mergesort/cuda_dp    ... OK
+[compilando] quicksort/openmp     ... OK
+[compilando] quicksort/cuda       ... OK
+[compilando] quicksort/cuda_dp    ... OK
+[compilando] bfs/openmp           ... OK
+[compilando] bfs/cuda             ... OK
+[compilando] bfs/cuda_dp          ... OK
+[compilando] sssp/openmp          ... OK
+[compilando] sssp/cuda            ... OK
+[compilando] sssp/cuda_dp         ... OK
+[ok] todos os binários compilados
+
+[ok] todos os 12 binários validados
+
+[limpeza] removendo CSVs anteriores em results/mx350...
+[limpeza] concluída
+
+======================================
+Benchmark: mx350  |  SM=61  [MODO SUDO]
+Iterações: 10  |  Runs internos: 1500
+Resultados: results/mx350
+======================================
+
+--- mergesort / openmp ---
+[mergesort/openmp] N=100                runs=1500 iter  1/10  tempo_total=0.134012s  gpu=0.0000J  cpu=0.73J  OK
+[mergesort/openmp] N=100                runs=1500 iter  2/10  tempo_total=0.285140s  gpu=0.0000J  cpu=1.35J  OK
+[mergesort/openmp] N=100                runs=1500 iter  3/10  tempo_total=0.084432s  gpu=0.0000J  cpu=0.40J  OK
+[mergesort/openmp] N=100                runs=1500 iter  4/10  tempo_total=0.195438s  gpu=0.0000J  cpu=0.90J  OK
+[mergesort/openmp] N=100                runs=1500 iter  5/10  tempo_total=0.089123s  gpu=0.0000J  cpu=0.43J  OK
+[mergesort/openmp] N=100                runs=1500 iter  6/10  tempo_total=0.117737s  gpu=0.0000J  cpu=0.58J  OK
+[mergesort/openmp] N=100                runs=1500 iter  7/10  tempo_total=0.472306s  gpu=0.0000J  cpu=2.51J  OK
+[mergesort/openmp] N=100                runs=1500 iter  8/10  tempo_total=0.699785s  gpu=0.0000J  cpu=4.08J  OK
+[mergesort/openmp] N=100                runs=1500 iter  9/10  tempo_total=2.880346s  gpu=0.0000J  cpu=17.13J  OK
+[mergesort/openmp] N=100                runs=1500 iter 10/10  tempo_total=0.199630s  gpu=0.0000J  cpu=1.11J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  1/10  tempo_total=10.837252s  gpu=0.0000J  cpu=63.78J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  2/10  tempo_total=14.800086s  gpu=0.0000J  cpu=85.62J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  3/10  tempo_total=8.420313s  gpu=0.0000J  cpu=48.61J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  4/10  tempo_total=7.204094s  gpu=0.0000J  cpu=41.65J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  5/10  tempo_total=10.046642s  gpu=0.0000J  cpu=59.83J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  6/10  tempo_total=7.273812s  gpu=0.0000J  cpu=41.31J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  7/10  tempo_total=8.378435s  gpu=0.0000J  cpu=47.42J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  8/10  tempo_total=7.215560s  gpu=0.0000J  cpu=40.96J  OK
+[mergesort/openmp] N=10000              runs=1500 iter  9/10  tempo_total=7.331021s  gpu=0.0000J  cpu=41.80J  OK
+[mergesort/openmp] N=10000              runs=1500 iter 10/10  tempo_total=7.114070s  gpu=0.0000J  cpu=41.38J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  1/10  tempo_total=73.013875s  gpu=0.0000J  cpu=421.21J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  2/10  tempo_total=70.375521s  gpu=0.0000J  cpu=388.03J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  3/10  tempo_total=67.088374s  gpu=0.0000J  cpu=346.83J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  4/10  tempo_total=67.891438s  gpu=0.0000J  cpu=354.13J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  5/10  tempo_total=68.697602s  gpu=0.0000J  cpu=359.62J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  6/10  tempo_total=68.945338s  gpu=0.0000J  cpu=362.14J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  7/10  tempo_total=67.883092s  gpu=0.0000J  cpu=349.26J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  8/10  tempo_total=67.655952s  gpu=0.0000J  cpu=349.64J  OK
+[mergesort/openmp] N=100000             runs=1500 iter  9/10  tempo_total=66.568140s  gpu=0.0000J  cpu=344.90J  OK
+[mergesort/openmp] N=100000             runs=1500 iter 10/10  tempo_total=68.874150s  gpu=0.0000J  cpu=359.05J  OK
+--- quicksort / openmp ---
+[quicksort/openmp] N=100                runs=1500 iter  1/10  tempo_total=2.626361s  gpu=0.0000J  cpu=10.21J  OK
+[quicksort/openmp] N=100                runs=1500 iter  2/10  tempo_total=0.011488s  gpu=0.0000J  cpu=0.07J  OK
+[quicksort/openmp] N=100                runs=1500 iter  3/10  tempo_total=0.010903s  gpu=0.0000J  cpu=0.06J  OK
+[quicksort/openmp] N=100                runs=1500 iter  4/10  tempo_total=0.011828s  gpu=0.0000J  cpu=0.07J  OK
+[quicksort/openmp] N=100                runs=1500 iter  5/10  tempo_total=0.011334s  gpu=0.0000J  cpu=0.06J  OK
+[quicksort/openmp] N=100                runs=1500 iter  6/10  tempo_total=0.012711s  gpu=0.0000J  cpu=0.06J  OK
+[quicksort/openmp] N=100                runs=1500 iter  7/10  tempo_total=0.011745s  gpu=0.0000J  cpu=0.07J  OK
+[quicksort/openmp] N=100                runs=1500 iter  8/10  tempo_total=0.012020s  gpu=0.0000J  cpu=0.07J  OK
+[quicksort/openmp] N=100                runs=1500 iter  9/10  tempo_total=0.009408s  gpu=0.0000J  cpu=0.07J  OK
+[quicksort/openmp] N=100                runs=1500 iter 10/10  tempo_total=0.011220s  gpu=0.0000J  cpu=0.06J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  1/10  tempo_total=1.094912s  gpu=0.0000J  cpu=4.96J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  2/10  tempo_total=0.998271s  gpu=0.0000J  cpu=4.56J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  3/10  tempo_total=1.118686s  gpu=0.0000J  cpu=5.02J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  4/10  tempo_total=0.979030s  gpu=0.0000J  cpu=4.48J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  5/10  tempo_total=1.078668s  gpu=0.0000J  cpu=4.87J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  6/10  tempo_total=0.964542s  gpu=0.0000J  cpu=4.35J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  7/10  tempo_total=1.026194s  gpu=0.0000J  cpu=4.67J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  8/10  tempo_total=1.049663s  gpu=0.0000J  cpu=4.80J  OK
+[quicksort/openmp] N=10000              runs=1500 iter  9/10  tempo_total=1.664123s  gpu=0.0000J  cpu=6.98J  OK
+[quicksort/openmp] N=10000              runs=1500 iter 10/10  tempo_total=1.627479s  gpu=0.0000J  cpu=6.84J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  1/10  tempo_total=9.914495s  gpu=0.0000J  cpu=47.22J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  2/10  tempo_total=11.942352s  gpu=0.0000J  cpu=54.30J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  3/10  tempo_total=15.472670s  gpu=0.0000J  cpu=68.53J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  4/10  tempo_total=13.774234s  gpu=0.0000J  cpu=71.34J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  5/10  tempo_total=13.967996s  gpu=0.0000J  cpu=72.00J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  6/10  tempo_total=15.364700s  gpu=0.0000J  cpu=88.08J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  7/10  tempo_total=11.688907s  gpu=0.0000J  cpu=61.09J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  8/10  tempo_total=13.651335s  gpu=0.0000J  cpu=69.56J  OK
+[quicksort/openmp] N=100000             runs=1500 iter  9/10  tempo_total=11.572444s  gpu=0.0000J  cpu=57.97J  OK
+[quicksort/openmp] N=100000             runs=1500 iter 10/10  tempo_total=12.398702s  gpu=0.0000J  cpu=61.85J  OK
+--- bfs / openmp ---
+[bfs/openmp] N=10000x30000        runs=1500 iter  1/10  tempo_total=9.115483s  gpu=0.0000J  cpu=46.97J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  2/10  tempo_total=9.382549s  gpu=0.0000J  cpu=48.50J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  3/10  tempo_total=9.594718s  gpu=0.0000J  cpu=49.90J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  4/10  tempo_total=8.383524s  gpu=0.0000J  cpu=43.44J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  5/10  tempo_total=8.906043s  gpu=0.0000J  cpu=45.86J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  6/10  tempo_total=0.872288s  gpu=0.0000J  cpu=4.13J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  7/10  tempo_total=9.091498s  gpu=0.0000J  cpu=46.96J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  8/10  tempo_total=9.386962s  gpu=0.0000J  cpu=48.34J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter  9/10  tempo_total=8.980388s  gpu=0.0000J  cpu=46.27J  OK
+[bfs/openmp] N=10000x30000        runs=1500 iter 10/10  tempo_total=8.404326s  gpu=0.0000J  cpu=43.28J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  1/10  tempo_total=88.684662s  gpu=0.0000J  cpu=465.27J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  2/10  tempo_total=95.519694s  gpu=0.0000J  cpu=499.66J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  3/10  tempo_total=91.992706s  gpu=0.0000J  cpu=442.49J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  4/10  tempo_total=89.936544s  gpu=0.0000J  cpu=432.70J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  5/10  tempo_total=90.594894s  gpu=0.0000J  cpu=437.03J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  6/10  tempo_total=92.636465s  gpu=0.0000J  cpu=447.66J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  7/10  tempo_total=107.942900s  gpu=0.0000J  cpu=520.24J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  8/10  tempo_total=93.129961s  gpu=0.0000J  cpu=450.12J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter  9/10  tempo_total=88.013324s  gpu=0.0000J  cpu=423.94J  OK
+[bfs/openmp] N=100000x300000      runs=1500 iter 10/10  tempo_total=93.948904s  gpu=0.0000J  cpu=450.84J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  1/10  tempo_total=828.091694s  gpu=0.0000J  cpu=039.80J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  2/10  tempo_total=750.400883s  gpu=0.0000J  cpu=630.83J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  3/10  tempo_total=705.054388s  gpu=0.0000J  cpu=446.33J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  4/10  tempo_total=64.433498s  gpu=0.0000J  cpu=288.16J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  5/10  tempo_total=739.682644s  gpu=0.0000J  cpu=621.35J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  6/10  tempo_total=39.560805s  gpu=0.0000J  cpu=172.23J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  7/10  tempo_total=742.628021s  gpu=0.0000J  cpu=627.69J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  8/10  tempo_total=845.203615s  gpu=0.0000J  cpu=095.93J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter  9/10  tempo_total=728.042818s  gpu=0.0000J  cpu=548.58J  OK
+[bfs/openmp] N=500000x1000000     runs=1500 iter 10/10  tempo_total=787.587372s  gpu=0.0000J  cpu=844.86J  OK
+--- sssp / openmp ---
+[sssp/openmp] N=1000x4000          runs=1500 iter  1/10  tempo_total=0.203014s  gpu=0.0000J  cpu=1.15J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  2/10  tempo_total=0.197604s  gpu=0.0000J  cpu=1.14J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  3/10  tempo_total=0.263666s  gpu=0.0000J  cpu=1.44J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  4/10  tempo_total=0.256505s  gpu=0.0000J  cpu=1.44J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  5/10  tempo_total=0.333271s  gpu=0.0000J  cpu=1.76J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  6/10  tempo_total=0.244876s  gpu=0.0000J  cpu=1.33J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  7/10  tempo_total=0.285447s  gpu=0.0000J  cpu=1.56J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  8/10  tempo_total=0.211545s  gpu=0.0000J  cpu=1.21J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter  9/10  tempo_total=0.226688s  gpu=0.0000J  cpu=1.29J  OK
+[sssp/openmp] N=1000x4000          runs=1500 iter 10/10  tempo_total=0.190655s  gpu=0.0000J  cpu=1.07J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  1/10  tempo_total=1.236123s  gpu=0.0000J  cpu=7.50J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  2/10  tempo_total=1.096486s  gpu=0.0000J  cpu=6.84J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  3/10  tempo_total=1.088648s  gpu=0.0000J  cpu=6.70J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  4/10  tempo_total=1.104967s  gpu=0.0000J  cpu=6.75J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  5/10  tempo_total=1.125042s  gpu=0.0000J  cpu=7.04J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  6/10  tempo_total=0.207987s  gpu=0.0000J  cpu=0.85J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  7/10  tempo_total=0.262829s  gpu=0.0000J  cpu=1.14J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  8/10  tempo_total=1.165151s  gpu=0.0000J  cpu=7.34J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter  9/10  tempo_total=1.158576s  gpu=0.0000J  cpu=7.08J  OK
+[sssp/openmp] N=10000x30000        runs=1500 iter 10/10  tempo_total=1.214679s  gpu=0.0000J  cpu=7.70J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  1/10  tempo_total=10.517989s  gpu=0.0000J  cpu=82.59J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  2/10  tempo_total=10.931660s  gpu=0.0000J  cpu=85.88J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  3/10  tempo_total=10.330336s  gpu=0.0000J  cpu=82.00J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  4/10  tempo_total=10.292856s  gpu=0.0000J  cpu=81.16J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  5/10  tempo_total=10.322183s  gpu=0.0000J  cpu=81.32J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  6/10  tempo_total=10.528531s  gpu=0.0000J  cpu=83.13J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  7/10  tempo_total=10.662288s  gpu=0.0000J  cpu=84.20J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  8/10  tempo_total=11.861327s  gpu=0.0000J  cpu=90.82J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter  9/10  tempo_total=10.616501s  gpu=0.0000J  cpu=83.97J  OK
+[sssp/openmp] N=100000x300000      runs=1500 iter 10/10  tempo_total=11.517020s  gpu=0.0000J  cpu=91.86J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  1/10  tempo_total=21.085933s  gpu=0.0000J  cpu=168.03J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  2/10  tempo_total=23.454251s  gpu=0.0000J  cpu=188.59J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  3/10  tempo_total=22.138908s  gpu=0.0000J  cpu=176.96J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  4/10  tempo_total=21.283806s  gpu=0.0000J  cpu=169.71J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  5/10  tempo_total=4.361731s  gpu=0.0000J  cpu=18.62J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  6/10  tempo_total=4.216349s  gpu=0.0000J  cpu=18.14J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  7/10  tempo_total=25.064296s  gpu=0.0000J  cpu=202.90J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  8/10  tempo_total=23.923647s  gpu=0.0000J  cpu=192.71J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter  9/10  tempo_total=23.461884s  gpu=0.0000J  cpu=188.43J  OK
+[sssp/openmp] N=200000x400000      runs=1500 iter 10/10  tempo_total=23.876508s  gpu=0.0000J  cpu=191.32J  OK
+
+--- mergesort / cuda ---
+[mergesort/cuda] N=100                runs=1500 iter  1/10  tempo_total=0.169009s  gpu=0.0000J  cpu=1.52J  OK
+[mergesort/cuda] N=100                runs=1500 iter  2/10  tempo_total=0.172650s  gpu=0.0000J  cpu=1.14J  OK
+[mergesort/cuda] N=100                runs=1500 iter  3/10  tempo_total=0.172835s  gpu=0.0000J  cpu=1.06J  OK
+[mergesort/cuda] N=100                runs=1500 iter  4/10  tempo_total=0.168201s  gpu=0.0000J  cpu=1.05J  OK
+[mergesort/cuda] N=100                runs=1500 iter  5/10  tempo_total=0.153376s  gpu=0.0000J  cpu=1.00J  OK
+[mergesort/cuda] N=100                runs=1500 iter  6/10  tempo_total=0.157417s  gpu=0.0000J  cpu=0.99J  OK
+[mergesort/cuda] N=100                runs=1500 iter  7/10  tempo_total=0.156356s  gpu=0.0000J  cpu=1.05J  OK
+[mergesort/cuda] N=100                runs=1500 iter  8/10  tempo_total=0.167445s  gpu=0.0000J  cpu=1.12J  OK
+[mergesort/cuda] N=100                runs=1500 iter  9/10  tempo_total=0.157043s  gpu=0.0000J  cpu=1.16J  OK
+[mergesort/cuda] N=100                runs=1500 iter 10/10  tempo_total=0.152197s  gpu=0.0000J  cpu=1.13J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  1/10  tempo_total=7.969875s  gpu=0.0000J  cpu=25.19J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  2/10  tempo_total=7.971409s  gpu=0.0000J  cpu=25.17J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  3/10  tempo_total=7.972783s  gpu=0.0000J  cpu=25.05J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  4/10  tempo_total=7.972057s  gpu=0.0000J  cpu=24.30J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  5/10  tempo_total=7.976118s  gpu=0.0000J  cpu=24.06J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  6/10  tempo_total=7.982303s  gpu=0.0000J  cpu=24.15J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  7/10  tempo_total=7.984958s  gpu=0.0000J  cpu=23.74J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  8/10  tempo_total=7.980905s  gpu=0.0000J  cpu=24.01J  OK
+[mergesort/cuda] N=10000              runs=1500 iter  9/10  tempo_total=7.973835s  gpu=0.0000J  cpu=23.46J  OK
+[mergesort/cuda] N=10000              runs=1500 iter 10/10  tempo_total=7.960951s  gpu=0.0000J  cpu=23.50J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  1/10  tempo_total=74.295090s  gpu=0.0000J  cpu=205.67J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  2/10  tempo_total=74.312800s  gpu=0.0000J  cpu=203.63J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  3/10  tempo_total=74.308560s  gpu=0.0000J  cpu=206.90J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  4/10  tempo_total=74.315381s  gpu=0.0000J  cpu=205.58J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  5/10  tempo_total=74.313326s  gpu=0.0000J  cpu=204.59J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  6/10  tempo_total=74.330353s  gpu=0.0000J  cpu=204.75J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  7/10  tempo_total=74.310524s  gpu=0.0000J  cpu=203.37J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  8/10  tempo_total=74.308569s  gpu=0.0000J  cpu=206.09J  OK
+[mergesort/cuda] N=100000             runs=1500 iter  9/10  tempo_total=74.280322s  gpu=0.0000J  cpu=205.72J  OK
+[mergesort/cuda] N=100000             runs=1500 iter 10/10  tempo_total=74.316718s  gpu=0.0000J  cpu=204.41J  OK
+--- quicksort / cuda ---
+[quicksort/cuda] N=100                runs=1500 iter  1/10  tempo_total=0.464393s  gpu=0.0000J  cpu=2.00J  OK
+[quicksort/cuda] N=100                runs=1500 iter  2/10  tempo_total=0.542303s  gpu=0.0000J  cpu=2.43J  OK
+[quicksort/cuda] N=100                runs=1500 iter  3/10  tempo_total=0.282514s  gpu=0.0000J  cpu=1.52J  OK
+[quicksort/cuda] N=100                runs=1500 iter  4/10  tempo_total=0.481337s  gpu=0.0000J  cpu=2.31J  OK
+[quicksort/cuda] N=100                runs=1500 iter  5/10  tempo_total=0.472863s  gpu=0.0000J  cpu=2.04J  OK
+[quicksort/cuda] N=100                runs=1500 iter  6/10  tempo_total=0.372252s  gpu=0.0000J  cpu=1.80J  OK
+[quicksort/cuda] N=100                runs=1500 iter  7/10  tempo_total=0.255431s  gpu=0.0000J  cpu=1.29J  OK
+[quicksort/cuda] N=100                runs=1500 iter  8/10  tempo_total=0.296236s  gpu=0.0000J  cpu=1.47J  OK
+[quicksort/cuda] N=100                runs=1500 iter  9/10  tempo_total=0.388902s  gpu=0.0000J  cpu=1.71J  OK
+[quicksort/cuda] N=100                runs=1500 iter 10/10  tempo_total=0.397732s  gpu=0.0000J  cpu=1.82J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  1/10  tempo_total=14.211197s  gpu=0.0000J  cpu=40.40J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  2/10  tempo_total=13.012734s  gpu=0.0000J  cpu=37.73J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  3/10  tempo_total=13.543264s  gpu=0.0000J  cpu=37.98J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  4/10  tempo_total=13.858200s  gpu=0.0000J  cpu=39.95J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  5/10  tempo_total=11.463462s  gpu=0.0000J  cpu=33.08J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  6/10  tempo_total=10.364715s  gpu=0.0000J  cpu=30.52J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  7/10  tempo_total=14.622804s  gpu=0.0000J  cpu=41.96J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  8/10  tempo_total=16.081574s  gpu=0.0000J  cpu=45.77J  OK
+[quicksort/cuda] N=10000              runs=1500 iter  9/10  tempo_total=14.655829s  gpu=0.0000J  cpu=42.39J  OK
+[quicksort/cuda] N=10000              runs=1500 iter 10/10  tempo_total=15.115516s  gpu=0.0000J  cpu=43.80J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  1/10  tempo_total=143.422201s  gpu=0.0000J  cpu=396.40J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  2/10  tempo_total=123.877550s  gpu=0.0000J  cpu=346.61J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  3/10  tempo_total=139.795450s  gpu=0.0000J  cpu=384.36J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  4/10  tempo_total=147.262619s  gpu=0.0000J  cpu=405.98J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  5/10  tempo_total=100.273822s  gpu=0.0000J  cpu=275.38J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  6/10  tempo_total=83.590430s  gpu=0.0000J  cpu=232.56J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  7/10  tempo_total=115.515032s  gpu=0.0000J  cpu=316.62J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  8/10  tempo_total=138.581981s  gpu=0.0000J  cpu=380.98J  OK
+[quicksort/cuda] N=100000             runs=1500 iter  9/10  tempo_total=105.484652s  gpu=0.0000J  cpu=291.57J  OK
+[quicksort/cuda] N=100000             runs=1500 iter 10/10  tempo_total=95.537825s  gpu=0.0000J  cpu=533.83J  OK
+--- bfs / cuda ---
+[bfs/cuda] N=10000x30000        runs=1500 iter  1/10  tempo_total=0.694294s  gpu=0.0000J  cpu=4.90J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  2/10  tempo_total=0.567478s  gpu=0.0000J  cpu=3.78J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  3/10  tempo_total=0.556670s  gpu=0.0000J  cpu=3.78J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  4/10  tempo_total=0.544816s  gpu=0.0000J  cpu=3.32J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  5/10  tempo_total=0.569410s  gpu=0.0000J  cpu=3.49J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  6/10  tempo_total=0.564684s  gpu=0.0000J  cpu=3.20J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  7/10  tempo_total=0.630562s  gpu=0.0000J  cpu=4.59J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  8/10  tempo_total=0.544222s  gpu=0.0000J  cpu=3.77J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter  9/10  tempo_total=0.582467s  gpu=0.0000J  cpu=3.95J  OK
+[bfs/cuda] N=10000x30000        runs=1500 iter 10/10  tempo_total=0.561731s  gpu=0.0000J  cpu=3.65J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  1/10  tempo_total=4.846378s  gpu=0.0000J  cpu=20.49J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  2/10  tempo_total=4.830363s  gpu=0.0000J  cpu=20.69J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  3/10  tempo_total=4.924989s  gpu=0.0000J  cpu=22.03J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  4/10  tempo_total=4.784947s  gpu=0.0000J  cpu=21.23J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  5/10  tempo_total=4.864663s  gpu=0.0000J  cpu=28.32J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  6/10  tempo_total=4.777163s  gpu=0.0000J  cpu=21.35J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  7/10  tempo_total=4.873631s  gpu=0.0000J  cpu=22.48J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  8/10  tempo_total=4.945452s  gpu=0.0000J  cpu=24.64J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter  9/10  tempo_total=4.865826s  gpu=0.0000J  cpu=23.05J  OK
+[bfs/cuda] N=100000x300000      runs=1500 iter 10/10  tempo_total=4.879570s  gpu=0.0000J  cpu=21.59J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  1/10  tempo_total=21.354834s  gpu=0.0000J  cpu=88.31J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  2/10  tempo_total=21.338040s  gpu=0.0000J  cpu=91.21J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  3/10  tempo_total=21.420090s  gpu=0.0000J  cpu=85.58J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  4/10  tempo_total=21.309596s  gpu=0.0000J  cpu=83.27J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  5/10  tempo_total=0.112103s  gpu=0.0000J  cpu=1.93J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  6/10  tempo_total=21.365816s  gpu=0.0000J  cpu=88.39J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  7/10  tempo_total=21.428543s  gpu=0.0000J  cpu=84.72J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  8/10  tempo_total=21.431705s  gpu=0.0000J  cpu=107.57J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter  9/10  tempo_total=21.401613s  gpu=0.0000J  cpu=87.30J  OK
+[bfs/cuda] N=500000x1000000     runs=1500 iter 10/10  tempo_total=21.308811s  gpu=0.0000J  cpu=78.89J  OK
+--- sssp / cuda ---
+[sssp/cuda] N=1000x4000          runs=1500 iter  1/10  tempo_total=0.443840s  gpu=0.0000J  cpu=2.86J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  2/10  tempo_total=0.446783s  gpu=0.0000J  cpu=2.97J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  3/10  tempo_total=0.562691s  gpu=0.0000J  cpu=3.61J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  4/10  tempo_total=0.468314s  gpu=0.0000J  cpu=3.92J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  5/10  tempo_total=0.408112s  gpu=0.0000J  cpu=2.62J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  6/10  tempo_total=0.496195s  gpu=0.0000J  cpu=3.19J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  7/10  tempo_total=0.494204s  gpu=0.0000J  cpu=3.19J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  8/10  tempo_total=0.561817s  gpu=0.0000J  cpu=3.57J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter  9/10  tempo_total=0.494291s  gpu=0.0000J  cpu=3.17J  OK
+[sssp/cuda] N=1000x4000          runs=1500 iter 10/10  tempo_total=0.597053s  gpu=0.0000J  cpu=3.75J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  1/10  tempo_total=0.817850s  gpu=0.0000J  cpu=5.09J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  2/10  tempo_total=0.934121s  gpu=0.0000J  cpu=8.27J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  3/10  tempo_total=0.744971s  gpu=0.0000J  cpu=5.77J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  4/10  tempo_total=0.822898s  gpu=0.0000J  cpu=5.53J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  5/10  tempo_total=0.792392s  gpu=0.0000J  cpu=6.53J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  6/10  tempo_total=0.841140s  gpu=0.0000J  cpu=7.23J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  7/10  tempo_total=0.913935s  gpu=0.0000J  cpu=8.47J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  8/10  tempo_total=0.866578s  gpu=0.0000J  cpu=7.64J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter  9/10  tempo_total=0.925224s  gpu=0.0000J  cpu=6.74J  OK
+[sssp/cuda] N=10000x30000        runs=1500 iter 10/10  tempo_total=0.756658s  gpu=0.0000J  cpu=3.80J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  1/10  tempo_total=6.250411s  gpu=0.0000J  cpu=23.99J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  2/10  tempo_total=6.854648s  gpu=0.0000J  cpu=29.22J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  3/10  tempo_total=6.795939s  gpu=0.0000J  cpu=28.35J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  4/10  tempo_total=6.105862s  gpu=0.0000J  cpu=25.83J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  5/10  tempo_total=6.168987s  gpu=0.0000J  cpu=24.55J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  6/10  tempo_total=6.351795s  gpu=0.0000J  cpu=25.98J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  7/10  tempo_total=6.122069s  gpu=0.0000J  cpu=25.75J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  8/10  tempo_total=6.712628s  gpu=0.0000J  cpu=28.22J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter  9/10  tempo_total=6.122940s  gpu=0.0000J  cpu=24.43J  OK
+[sssp/cuda] N=100000x300000      runs=1500 iter 10/10  tempo_total=5.856842s  gpu=0.0000J  cpu=22.58J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  1/10  tempo_total=24.340110s  gpu=0.0000J  cpu=101.35J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  2/10  tempo_total=24.490321s  gpu=0.0000J  cpu=99.76J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  3/10  tempo_total=25.277778s  gpu=0.0000J  cpu=101.42J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  4/10  tempo_total=22.857013s  gpu=0.0000J  cpu=83.57J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  5/10  tempo_total=25.779944s  gpu=0.0000J  cpu=95.82J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  6/10  tempo_total=23.756986s  gpu=0.0000J  cpu=87.41J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  7/10  tempo_total=27.286897s  gpu=0.0000J  cpu=99.23J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  8/10  tempo_total=23.444483s  gpu=0.0000J  cpu=84.35J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter  9/10  tempo_total=25.228041s  gpu=0.0000J  cpu=110.08J  OK
+[sssp/cuda] N=200000x400000      runs=1500 iter 10/10  tempo_total=1.146567s  gpu=0.0000J  cpu=6.55J  OK
+
+--- mergesort / cuda_dp ---
+[mergesort/cuda_dp] N=100                runs=1500 iter  1/10  tempo_total=0.668539s  gpu=0.0000J  cpu=4.32J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  2/10  tempo_total=0.714734s  gpu=0.0000J  cpu=4.71J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  3/10  tempo_total=0.678362s  gpu=0.0000J  cpu=3.84J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  4/10  tempo_total=0.727556s  gpu=0.0000J  cpu=4.34J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  5/10  tempo_total=0.616426s  gpu=0.0000J  cpu=3.51J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  6/10  tempo_total=0.726750s  gpu=0.0000J  cpu=3.55J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  7/10  tempo_total=0.650599s  gpu=0.0000J  cpu=3.62J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  8/10  tempo_total=0.707327s  gpu=0.0000J  cpu=3.50J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter  9/10  tempo_total=0.688453s  gpu=0.0000J  cpu=4.71J  OK
+[mergesort/cuda_dp] N=100                runs=1500 iter 10/10  tempo_total=0.693216s  gpu=0.0000J  cpu=4.32J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  1/10  tempo_total=4742.091341s  gpu=0.0000J  cpu=362.71J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  2/10  tempo_total=4753.160155s  gpu=0.0000J  cpu=029.44J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  3/10  tempo_total=4749.301465s  gpu=0.0000J  cpu=944.47J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  4/10  tempo_total=4674.876170s  gpu=0.0000J  cpu=366.20J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  5/10  tempo_total=4752.296919s  gpu=0.0000J  cpu=345.34J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  6/10  tempo_total=4749.638683s  gpu=0.0000J  cpu=872.08J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  7/10  tempo_total=4651.193538s  gpu=0.0000J  cpu=762.97J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  8/10  tempo_total=4796.123066s  gpu=0.0000J  cpu=191.33J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter  9/10  tempo_total=4753.693765s  gpu=0.0000J  cpu=001.63J  OK
+[mergesort/cuda_dp] N=10000              runs=1500 iter 10/10  tempo_total=4705.029626s  gpu=0.0000J  cpu=866.78J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  1/10  tempo_total=11935.727615s  gpu=0.0000J  cpu=475.52J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  2/10  tempo_total=11902.356596s  gpu=0.0000J  cpu=723.47J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  3/10  tempo_total=12011.021306s  gpu=0.0000J  cpu=442.99J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  4/10  tempo_total=11995.605467s  gpu=0.0000J  cpu=786.31J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  5/10  tempo_total=12000.394201s  gpu=0.0000J  cpu=971.93J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  6/10  tempo_total=12029.575539s  gpu=0.0000J  cpu=057.59J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  7/10  tempo_total=11863.978854s  gpu=0.0000J  cpu=603.44J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  8/10  tempo_total=12019.326162s  gpu=0.0000J  cpu=662.27J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter  9/10  tempo_total=11990.703634s  gpu=0.0000J  cpu=515.21J  OK
+[mergesort/cuda_dp] N=100000             runs=1500 iter 10/10  tempo_total=11909.078856s  gpu=0.0000J  cpu=493.18J  OK
+--- quicksort / cuda_dp ---
+[quicksort/cuda_dp] N=100                runs=1500 iter  1/10  tempo_total=1.152852s  gpu=0.0000J  cpu=5.96J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  2/10  tempo_total=1.205104s  gpu=0.0000J  cpu=6.18J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  3/10  tempo_total=1.176976s  gpu=0.0000J  cpu=5.82J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  4/10  tempo_total=1.195235s  gpu=0.0000J  cpu=5.92J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  5/10  tempo_total=1.328658s  gpu=0.0000J  cpu=6.52J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  6/10  tempo_total=1.738224s  gpu=0.0000J  cpu=8.02J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  7/10  tempo_total=1.022292s  gpu=0.0000J  cpu=5.22J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  8/10  tempo_total=1.235503s  gpu=0.0000J  cpu=6.30J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter  9/10  tempo_total=1.351010s  gpu=0.0000J  cpu=6.74J  OK
+[quicksort/cuda_dp] N=100                runs=1500 iter 10/10  tempo_total=1.246155s  gpu=0.0000J  cpu=6.21J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  1/10  tempo_total=9.528275s  gpu=0.0000J  cpu=33.58J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  2/10  tempo_total=11.103359s  gpu=0.0000J  cpu=38.11J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  3/10  tempo_total=11.111638s  gpu=0.0000J  cpu=39.01J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  4/10  tempo_total=11.848665s  gpu=0.0000J  cpu=41.19J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  5/10  tempo_total=12.957903s  gpu=0.0000J  cpu=51.59J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  6/10  tempo_total=10.478397s  gpu=0.0000J  cpu=38.19J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  7/10  tempo_total=11.922625s  gpu=0.0000J  cpu=43.92J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  8/10  tempo_total=13.057491s  gpu=0.0000J  cpu=46.97J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter  9/10  tempo_total=13.145587s  gpu=0.0000J  cpu=46.04J  OK
+[quicksort/cuda_dp] N=10000              runs=1500 iter 10/10  tempo_total=11.788587s  gpu=0.0000J  cpu=42.32J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  1/10  tempo_total=168.928010s  gpu=0.0000J  cpu=565.41J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  2/10  tempo_total=135.536573s  gpu=0.0000J  cpu=449.02J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  3/10  tempo_total=158.163874s  gpu=0.0000J  cpu=543.80J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  4/10  tempo_total=170.631281s  gpu=0.0000J  cpu=552.02J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  5/10  tempo_total=141.836782s  gpu=0.0000J  cpu=462.83J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  6/10  tempo_total=139.736820s  gpu=0.0000J  cpu=474.88J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  7/10  tempo_total=129.709768s  gpu=0.0000J  cpu=465.49J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  8/10  tempo_total=172.614175s  gpu=0.0000J  cpu=710.93J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter  9/10  tempo_total=139.945847s  gpu=0.0000J  cpu=584.75J  OK
+[quicksort/cuda_dp] N=100000             runs=1500 iter 10/10  tempo_total=136.849534s  gpu=0.0000J  cpu=585.43J  OK
+--- bfs / cuda_dp ---
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  1/10  tempo_total=0.833963s  gpu=0.0000J  cpu=5.40J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  2/10  tempo_total=0.875173s  gpu=0.0000J  cpu=5.85J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  3/10  tempo_total=0.938374s  gpu=0.0000J  cpu=5.86J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  4/10  tempo_total=1.008025s  gpu=0.0000J  cpu=6.19J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  5/10  tempo_total=0.975932s  gpu=0.0000J  cpu=5.71J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  6/10  tempo_total=0.859325s  gpu=0.0000J  cpu=5.26J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  7/10  tempo_total=1.014190s  gpu=0.0000J  cpu=6.28J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  8/10  tempo_total=1.044144s  gpu=0.0000J  cpu=6.38J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter  9/10  tempo_total=0.870473s  gpu=0.0000J  cpu=5.69J  OK
+[bfs/cuda_dp] N=10000x30000        runs=1500 iter 10/10  tempo_total=0.879828s  gpu=0.0000J  cpu=5.67J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  1/10  tempo_total=5.523073s  gpu=0.0000J  cpu=30.22J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  2/10  tempo_total=5.520720s  gpu=0.0000J  cpu=24.58J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  3/10  tempo_total=5.394614s  gpu=0.0000J  cpu=23.51J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  4/10  tempo_total=5.430620s  gpu=0.0000J  cpu=26.98J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  5/10  tempo_total=5.348047s  gpu=0.0000J  cpu=21.42J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  6/10  tempo_total=5.455894s  gpu=0.0000J  cpu=21.16J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  7/10  tempo_total=5.379355s  gpu=0.0000J  cpu=20.61J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  8/10  tempo_total=5.388735s  gpu=0.0000J  cpu=20.43J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter  9/10  tempo_total=0.057421s  gpu=0.0000J  cpu=1.29J  OK
+[bfs/cuda_dp] N=100000x300000      runs=1500 iter 10/10  tempo_total=5.435569s  gpu=0.0000J  cpu=20.87J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  1/10  tempo_total=0.117934s  gpu=0.0000J  cpu=1.97J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  2/10  tempo_total=0.118296s  gpu=0.0000J  cpu=1.82J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  3/10  tempo_total=0.154669s  gpu=0.0000J  cpu=2.12J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  4/10  tempo_total=22.309710s  gpu=0.0000J  cpu=86.66J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  5/10  tempo_total=22.298303s  gpu=0.0000J  cpu=77.19J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  6/10  tempo_total=0.153090s  gpu=0.0000J  cpu=1.92J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  7/10  tempo_total=22.401477s  gpu=0.0000J  cpu=85.20J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  8/10  tempo_total=22.277498s  gpu=0.0000J  cpu=87.73J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter  9/10  tempo_total=22.444786s  gpu=0.0000J  cpu=77.98J  OK
+[bfs/cuda_dp] N=500000x1000000     runs=1500 iter 10/10  tempo_total=22.231636s  gpu=0.0000J  cpu=83.59J  OK
+--- sssp / cuda_dp ---
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  1/10  tempo_total=0.502818s  gpu=0.0000J  cpu=3.29J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  2/10  tempo_total=0.569601s  gpu=0.0000J  cpu=3.42J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  3/10  tempo_total=0.586784s  gpu=0.0000J  cpu=3.50J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  4/10  tempo_total=0.684794s  gpu=0.0000J  cpu=3.89J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  5/10  tempo_total=0.546770s  gpu=0.0000J  cpu=3.19J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  6/10  tempo_total=0.485852s  gpu=0.0000J  cpu=3.15J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  7/10  tempo_total=0.596856s  gpu=0.0000J  cpu=3.40J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  8/10  tempo_total=0.472884s  gpu=0.0000J  cpu=3.36J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter  9/10  tempo_total=0.620721s  gpu=0.0000J  cpu=3.51J  OK
+[sssp/cuda_dp] N=1000x4000          runs=1500 iter 10/10  tempo_total=0.662256s  gpu=0.0000J  cpu=3.87J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  1/10  tempo_total=1.034183s  gpu=0.0000J  cpu=5.46J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  2/10  tempo_total=0.943751s  gpu=0.0000J  cpu=4.84J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  3/10  tempo_total=0.971258s  gpu=0.0000J  cpu=5.29J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  4/10  tempo_total=0.980433s  gpu=0.0000J  cpu=5.32J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  5/10  tempo_total=0.967514s  gpu=0.0000J  cpu=5.06J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  6/10  tempo_total=1.166146s  gpu=0.0000J  cpu=5.92J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  7/10  tempo_total=0.923183s  gpu=0.0000J  cpu=4.83J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  8/10  tempo_total=1.018414s  gpu=0.0000J  cpu=5.33J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter  9/10  tempo_total=1.012673s  gpu=0.0000J  cpu=6.09J  OK
+[sssp/cuda_dp] N=10000x30000        runs=1500 iter 10/10  tempo_total=1.027222s  gpu=0.0000J  cpu=5.24J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  1/10  tempo_total=14.598242s  gpu=0.0000J  cpu=57.56J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  2/10  tempo_total=14.731129s  gpu=0.0000J  cpu=53.02J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  3/10  tempo_total=14.393705s  gpu=0.0000J  cpu=51.93J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  4/10  tempo_total=13.850280s  gpu=0.0000J  cpu=49.46J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  5/10  tempo_total=14.181882s  gpu=0.0000J  cpu=61.52J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  6/10  tempo_total=13.560278s  gpu=0.0000J  cpu=49.90J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  7/10  tempo_total=14.428570s  gpu=0.0000J  cpu=54.26J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  8/10  tempo_total=15.363431s  gpu=0.0000J  cpu=62.43J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter  9/10  tempo_total=14.413694s  gpu=0.0000J  cpu=54.15J  OK
+[sssp/cuda_dp] N=100000x300000      runs=1500 iter 10/10  tempo_total=15.171796s  gpu=0.0000J  cpu=61.51J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  1/10  tempo_total=32.164260s  gpu=0.0000J  cpu=123.91J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  2/10  tempo_total=35.029597s  gpu=0.0000J  cpu=129.77J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  3/10  tempo_total=34.998778s  gpu=0.0000J  cpu=134.61J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  4/10  tempo_total=32.910060s  gpu=0.0000J  cpu=112.98J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  5/10  tempo_total=1.488339s  gpu=0.0000J  cpu=7.49J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  6/10  tempo_total=1.481892s  gpu=0.0000J  cpu=7.37J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  7/10  tempo_total=1.486962s  gpu=0.0000J  cpu=7.33J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  8/10  tempo_total=33.209789s  gpu=0.0000J  cpu=135.12J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter  9/10  tempo_total=36.498947s  gpu=0.0000J  cpu=143.00J  OK
+[sssp/cuda_dp] N=200000x400000      runs=1500 iter 10/10  tempo_total=34.661757s  gpu=0.0000J  cpu=128.58J  OK
+
+======================================
+Benchmark concluído.
+Resultados salvos em: results/mx350
+======================================
