@@ -166,8 +166,8 @@ static void modo_teste(void) {
 static void modo_benchmark(void) {
     const int tamanhos[] = {100, 10000, 100000};
     const int n_tamanhos = 3;
-    const int N_ITER     = 20;
-    const int N_REPS     = 250;
+    const int N_ITER     = 10;
+    const int N_REPS     = 100;
 
     for (int ti = 0; ti < n_tamanhos; ti++) {
         int N = tamanhos[ti];

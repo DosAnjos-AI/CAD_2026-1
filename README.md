@@ -61,10 +61,10 @@ CAD_2026-1/
 
 | Parametro | Valor |
 |---|---|
-| Iteracoes por configuracao | 20 |
-| Execucoes por iteracao | 250 |
-| Total de execucoes por configuracao | 5.000 |
-| Warmup | 1 iteracao descartada antes das 20 medidas |
+| Iteracoes por configuracao | 10 |
+| Execucoes por iteracao | 100 |
+| Total de execucoes por configuracao | 1.000 |
+| Warmup | 1 iteracao descartada antes das 10 medidas |
 | Sleep entre tamanhos | 30 segundos (isolamento termico) |
 | Sleep entre binarios | 20 segundos |
 
