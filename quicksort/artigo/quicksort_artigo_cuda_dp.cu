@@ -321,8 +321,8 @@ static void modo_teste(void) {
 static void modo_benchmark(void) {
     const int tamanhos[] = {100, 10000, 100000};
     const int n_tamanhos = 3;
-    const int N_ITER     = 25;
-    const int N_REPS     = 400;
+    const int N_ITER     = 20;
+    const int N_REPS     = 250;
 
     cudaDeviceSetLimit(cudaLimitDevRuntimeSyncDepth, 24);
 

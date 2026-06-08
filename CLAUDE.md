@@ -25,9 +25,9 @@ Após cada script implementado, executar **sempre** no modo de teste antes de qu
 
 | Parâmetro | Valor |
 |---|---|
-| Iterações por configuração | 25 |
-| Execuções por iteração | 400 |
-| Total de execuções | 10.000 |
+| Iterações por configuração | 20 |
+| Execuções por iteração | 250 |
+| Total de execuções | 5.000 |
 | Warmup | 1 iteração descartada |
 | Sleep entre tamanhos | 30s |
 | Sleep entre versões | 20s |
