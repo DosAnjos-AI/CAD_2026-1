@@ -1,0 +1,50 @@
+# binarios compilados — mergesort
+mergesort/artigo/mergesort_artigo_openmp
+mergesort/artigo/mergesort_artigo_cuda
+mergesort/artigo/mergesort_artigo_cuda_dp
+mergesort/otimizado/mergesort_otimizado_openmp
+mergesort/otimizado/mergesort_otimizado_cuda
+mergesort/otimizado/mergesort_otimizado_cuda_dp
+mergesort/sequencial/mergesort_sequencial
+
+# binarios compilados — quicksort
+quicksort/artigo/quicksort_artigo_openmp
+quicksort/artigo/quicksort_artigo_cuda
+quicksort/artigo/quicksort_artigo_cuda_dp
+quicksort/otimizado/quicksort_otimizado_openmp
+quicksort/otimizado/quicksort_otimizado_cuda
+quicksort/otimizado/quicksort_otimizado_cuda_dp
+quicksort/sequencial/quicksort_sequencial
+
+# binarios compilados — bfs
+bfs/artigo/bfs_artigo_openmp
+bfs/artigo/bfs_artigo_cuda
+bfs/artigo/bfs_artigo_cuda_dp
+bfs/otimizado/bfs_otimizado_openmp
+bfs/otimizado/bfs_otimizado_cuda
+bfs/otimizado/bfs_otimizado_cuda_dp
+bfs/sequencial/bfs_sequencial
+
+# binarios compilados — sssp
+sssp/artigo/sssp_artigo_openmp
+sssp/artigo/sssp_artigo_cuda
+sssp/artigo/sssp_artigo_cuda_dp
+sssp/otimizado/sssp_otimizado_openmp
+sssp/otimizado/sssp_otimizado_cuda
+sssp/otimizado/sssp_otimizado_cuda_dp
+sssp/sequencial/sssp_sequencial
+
+# arquivos temporarios de coleta de energia
+/tmp/dmon_*.log
+/tmp/tegra_*.log
+/tmp/compile_err.log
+
+# pid do processo em background
+run_all.pid
+
+# logs de execucao (nao versionar — gerados em cada maquina)
+results/run_all.log
+results/benchmark.log
+
+# resultados CSV versionados — NAO ignorar benchmark.csv
+# results/benchmark.csv <- incluido intencionalmente
