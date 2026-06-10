@@ -297,62 +297,42 @@ static void grafo_gpu_liberar(int *d_adj, int *d_offset, int *d_size) {
 
 /* ---------- kernels BFS com Dynamic Parallelism ---------- */
 
-/* kernel secundario — relaxa arestas de todos os nos visitados (Bellman-Ford);
- * sem lancamentos recursivos; usa atomicMin para escrita segura em paralelo */
-__global__ void bfs_kernel_secundario(int *distance, int *adjacencyList,
+/* kernel secundario — processa apenas as adjacencias do no v especifico;
+ * chamado pelo kernel principal via DP para cobrir um nivel adicional da arvore BFS */
+__global__ void bfs_kernel_secundario(int v, int *distance,
+                                       int *adjacencyList,
                                        int *edgesOffset, int *edgesSize,
-                                       int N, int *changed) {
-    __shared__ int blkChanged;
-    if (threadIdx.x == 0) blkChanged = 0;
-    __syncthreads();
+                                       int *changed) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= edgesSize[v]) return;
 
-    int thid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (thid < N && distance[thid] != INT_MAX) {
-        int d = distance[thid];
-        for (int i = edgesOffset[thid];
-             i < edgesOffset[thid] + edgesSize[thid]; i++) {
-            int v = adjacencyList[i];
-            if (atomicMin(&distance[v], d + 1) > d + 1)
-                blkChanged = 1;
-        }
-    }
-    __syncthreads();
-
-    if (threadIdx.x == 0 && blkChanged)
+    int vizinho = adjacencyList[edgesOffset[v] + idx];
+    int novo_d  = distance[v] + 1;
+    if (atomicMin(&distance[vizinho], novo_d) > novo_d)
         atomicOr(changed, 1);
 }
 
-/* kernel principal — mesmo padrao Bellman-Ford; bloco 0 lanca kernel
- * secundario via DP quando detecta mudanca local (nivel ignorado: o loop
- * da CPU itera ate convergencia Bellman-Ford, sem depender do nivel) */
-__global__ void bfs_kernel_dp(int *distance, int nivel, int *adjacencyList,
+/* kernel principal — processa nos com distance[thid] <= nivel;
+ * a thread que detecta atualizacao em vizinho v lanca kernel secundario para v via DP */
+__global__ void bfs_kernel_dp(int *distance, int nivel,
+                               int *adjacencyList,
                                int *edgesOffset, int *edgesSize,
                                int N, int *changed) {
-    (void)nivel; /* nivel nao restringe o processamento: convergencia via CPU */
-    __shared__ int blkChanged;
-    if (threadIdx.x == 0) blkChanged = 0;
-    __syncthreads();
-
     int thid = blockIdx.x * blockDim.x + threadIdx.x;
-    if (thid < N && distance[thid] != INT_MAX) {
-        int d = distance[thid];
-        for (int i = edgesOffset[thid];
-             i < edgesOffset[thid] + edgesSize[thid]; i++) {
-            int v = adjacencyList[i];
-            if (atomicMin(&distance[v], d + 1) > d + 1)
-                blkChanged = 1;
-        }
-    }
-    __syncthreads();
+    if (thid >= N || distance[thid] > nivel) return;
 
-    if (threadIdx.x == 0 && blkChanged) {
-        atomicOr(changed, 1);
-        /* bloco 0 lanca kernel secundario via DP: passo adicional de relaxacao */
-        if (blockIdx.x == 0) {
-            int numBlocks = (N + 255) / 256;
-            bfs_kernel_secundario<<<numBlocks, 256>>>(distance, adjacencyList,
-                                                       edgesOffset, edgesSize,
-                                                       N, changed);
+    int d = distance[thid];
+    for (int i = edgesOffset[thid]; i < edgesOffset[thid] + edgesSize[thid]; i++) {
+        int v = adjacencyList[i];
+        if (atomicMin(&distance[v], d + 1) > d + 1) {
+            atomicOr(changed, 1);
+            if (edgesSize[v] > 0) {
+                int blocks = (edgesSize[v] + 255) / 256;
+                bfs_kernel_secundario<<<blocks, 256>>>(v, distance,
+                                                        adjacencyList,
+                                                        edgesOffset, edgesSize,
+                                                        changed);
+            }
         }
     }
 }
@@ -377,7 +357,7 @@ static void bfs_cuda_dp(int N, int *d_adj, int *d_offset, int *d_size,
         bfs_kernel_dp<<<numBlocks, 256>>>(distance, nivel, d_adj,
                                            d_offset, d_size, N, changed);
         cudaDeviceSynchronize();
-        nivel++;
+        nivel += 2;
     }
 }
 
@@ -435,8 +415,8 @@ static void modo_benchmark(void) {
     const int nos[]     = {10000,   100000,   500000};
     const int arestas[] = {30000,   300000,  1000000};
     const int n_tam     = 3;
-    const int N_ITER    = 10;
-    const int N_REPS    = 100;
+    const int N_ITER    = 5;
+    const int N_REPS    = 50;
 
     for (int ti = 0; ti < n_tam; ti++) {
         int N = nos[ti];

@@ -223,8 +223,8 @@ static void modo_benchmark(void) {
     const int nos[]     = {1000,   10000,  100000,  200000};
     const int arestas[] = {4000,   30000,  300000,  400000};
     const int n_tam     = 4;
-    const int N_ITER    = 10;
-    const int N_REPS    = 100;
+    const int N_ITER    = 5;
+    const int N_REPS    = 50;
 
     for (int ti = 0; ti < n_tam; ti++) {
         int N = nos[ti];

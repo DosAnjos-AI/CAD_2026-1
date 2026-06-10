@@ -61,10 +61,10 @@ CAD_2026-1/
 
 | Parametro | Valor |
 |---|---|
-| Iteracoes por configuracao | 10 |
-| Execucoes por iteracao | 100 |
-| Total de execucoes por configuracao | 1.000 |
-| Warmup | 1 iteracao descartada antes das 10 medidas |
+| Iteracoes por configuracao | 5 |
+| Execucoes por iteracao | 50 |
+| Total de execucoes por configuracao | 250 |
+| Warmup | 1 iteracao descartada antes das 5 medidas |
 | Sleep entre tamanhos | 30 segundos (isolamento termico) |
 | Sleep entre binarios | 20 segundos |
 
@@ -96,7 +96,7 @@ algoritmo|api|versao|hardware|tamanho|iteracao|tempo_total_s|energia_gpu_j|energ
 | versao | artigo, otimizado, sequencial |
 | hardware | mx350, rtx4090, jetson |
 | tamanho | numero de elementos ou nos |
-| iteracao | 1 a 20 |
+| iteracao | 1 a 5 |
 | tempo_total_s | tempo medio por execucao (segundos, decimal virgula) |
 | energia_gpu_j | energia GPU em joules (NA se indisponivel) |
 | energia_cpu_j | energia CPU em joules via RAPL/perf (NA se indisponivel) |
