@@ -176,7 +176,6 @@ log_info "inicio: $(date)"
 
 # mergesort
 executar mergesort/artigo/mergesort_artigo_openmp        "mergesort openmp artigo"
-executar mergesort/artigo/mergesort_artigo_cuda          "mergesort cuda artigo"
 executar mergesort/artigo/mergesort_artigo_cuda_dp       "mergesort cuda_dp artigo"
 executar mergesort/otimizado/mergesort_otimizado_openmp  "mergesort openmp otimizado"
 executar mergesort/otimizado/mergesort_otimizado_cuda    "mergesort cuda otimizado"
@@ -209,6 +208,9 @@ executar sssp/otimizado/sssp_otimizado_openmp            "sssp openmp otimizado"
 executar sssp/otimizado/sssp_otimizado_cuda              "sssp cuda otimizado"
 executar sssp/otimizado/sssp_otimizado_cuda_dp           "sssp cuda_dp otimizado"
 executar sssp/sequencial/sssp_sequencial                 "sssp sequencial"
+
+# executado por ultimo — N=100K leva ~21h na MX350
+executar mergesort/artigo/mergesort_artigo_cuda          "mergesort cuda artigo"
 
 log_info "fim: $(date)"
 log_info "=== EXECUCAO CONCLUIDA ==="
