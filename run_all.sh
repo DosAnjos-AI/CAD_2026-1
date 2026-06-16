@@ -11,6 +11,8 @@ set -u -o pipefail
 
 cd "$(dirname "$0")"
 
+mkdir -p results
+
 CSV="results/resultados.csv"
 
 # ---------------------------------------------------------------------------
