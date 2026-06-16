@@ -1,5 +1,5 @@
 #!/bin/bash
-# Orquestrador do benchmark CAD_2026_v3.
+# Orquestrador do benchmark CAD_2026_v3_inv.
 # Compila todos os binarios e executa cada combinacao algoritmo|api|tamanho,
 # pulando combinacoes ja completas (10 linhas) no CSV de resultados.
 #
@@ -120,14 +120,14 @@ processar_algoritmo() {
     done
 }
 
-# Ordem de execucao (branch CAD_2026_v3): bitonic_sort -> merge_sort -> bfs -> floyd_warshall
+# Ordem de execucao (branch CAD_2026_v3_inv): floyd_warshall -> bfs -> merge_sort -> bitonic_sort
 # Sleep de 3s entre algoritmos distintos para isolamento termico.
-processar_algoritmo "bitonic_sort" "bitonic" "bitonic_sort" "$TAMANHOS_VETOR"
-sleep 3
-processar_algoritmo "merge_sort" "merge" "merge_sort" "$TAMANHOS_VETOR"
+processar_algoritmo "floyd_warshall" "floyd" "floyd_warshall" "$TAMANHOS_FW"
 sleep 3
 processar_algoritmo "bfs" "bfs" "bfs" "$TAMANHOS_BFS"
 sleep 3
-processar_algoritmo "floyd_warshall" "floyd" "floyd_warshall" "$TAMANHOS_FW"
+processar_algoritmo "merge_sort" "merge" "merge_sort" "$TAMANHOS_VETOR"
+sleep 3
+processar_algoritmo "bitonic_sort" "bitonic" "bitonic_sort" "$TAMANHOS_VETOR"
 
 log_msg "Benchmark concluido"
