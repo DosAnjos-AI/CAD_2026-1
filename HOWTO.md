@@ -31,7 +31,7 @@ nproc
 Comando único, em background, sobrevivendo a desconexão de terminal:
 
 ```bash
-nohup ./run_all.sh > results/log.txt 2>&1 &
+mkdir -p results && nohup ./run_all.sh > results/log.txt 2>&1 &
 ```
 
 O script não aceita argumentos — só roda como `./run_all.sh`. Ele compila
@@ -65,7 +65,7 @@ Se a máquina desligar ou o processo for interrompido no meio da execução:
   da interrupção — nada é perdido.
 - A combinação que estava em andamento no momento da interrupção fica
   parcial (menos de 10 linhas medidas).
-- Basta rodar `nohup ./run_all.sh > results/log.txt 2>&1 &` novamente. O
+- Basta rodar `mkdir -p results && nohup ./run_all.sh > results/log.txt 2>&1 &` novamente. O
   script:
   1. Recompila todos os binários (idempotente, sem custo relevante)
   2. Para cada combinação, verifica `combinacao_completa()`: se já tem 10
@@ -220,5 +220,5 @@ falso e a combinação é reprocessada do zero (warmup + 10 medidas):
 ```bash
 grep -v "^merge_sort|cuda|aleatorio|4194304|" results/resultados.csv > /tmp/csv_limpo
 mv /tmp/csv_limpo results/resultados.csv
-nohup ./run_all.sh > results/log.txt 2>&1 &
+mkdir -p results && nohup ./run_all.sh > results/log.txt 2>&1 &
 ```
