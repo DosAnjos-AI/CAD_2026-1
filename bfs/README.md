@@ -8,10 +8,14 @@ distância 2, e assim por diante, até esgotar os vértices alcançáveis.
 Complexidade O(V+E) — cada vértice e cada aresta são examinados no máximo uma
 vez.
 
-O grafo usado é Erdős–Rényi não-dirigido com grau médio 16: para cada par
-`(u, w)` com `u < w`, a aresta existe com probabilidade `p = 16.0/V`,
-testada com `rand()` sob `srand(42)` — mesma semente em todas as APIs,
-garantindo o mesmo grafo entre execuções e entre implementações.
+O grafo usado é Erdős–Rényi não-dirigido com grau médio 16 (aresta com
+probabilidade `p = 16.0/V`), gerado por **amostragem geométrica
+(Batagelj–Brandes)**: em vez de testar todos os `O(V²)` pares, salta
+diretamente para a próxima aresta sorteando o intervalo a partir de uma
+distribuição geométrica (`skip = log(1-r)/log(1-p)`), resultando em custo
+`O(V + E)`. Isso removeu o gargalo quadrático que inviabilizava os tamanhos
+grandes. Usa `srand(42)` — mesma semente em todas as APIs, garantindo o
+mesmo grafo entre execuções e entre implementações.
 
 Representação: CSR (Compressed Sparse Row), com `row_ptr[V+1]` e
 `col_idx[E]`, ambos `int32_t`. A fonte é sempre o vértice 0.
@@ -36,8 +40,9 @@ buffer intermediário de arestas.
 
 **Como compilar**:
 ```bash
-gcc -O3 -march=native -o bfs_cpu bfs_cpu.c
+gcc -O3 -march=native -o bfs_cpu bfs_cpu.c -lm
 ```
+O `-lm` é necessário por causa do `log()` usado na amostragem geométrica.
 
 **Como executar**:
 ```bash
@@ -72,7 +77,7 @@ final da região `parallel`.
 
 **Como compilar**:
 ```bash
-gcc -O3 -march=native -fopenmp -DNUM_THREADS=$(nproc) -o bfs_openmp bfs_openmp.c
+gcc -O3 -march=native -fopenmp -DNUM_THREADS=$(nproc) -o bfs_openmp bfs_openmp.c -lm
 ```
 
 **Como executar**:
@@ -106,7 +111,7 @@ primeira posição (`dist[0] = 0`, fonte sempre vértice 0).
 
 **Como compilar**:
 ```bash
-nvcc -O3 -arch=sm_89 -o bfs_cuda bfs_cuda.cu
+nvcc -O3 -arch=sm_89 -o bfs_cuda bfs_cuda.cu -lm
 ```
 
 **Como executar**:
@@ -143,7 +148,7 @@ fingir uma medida de paralelismo que não existe.
 
 **Como compilar**:
 ```bash
-nvcc -O3 -arch=sm_89 -rdc=true -o bfs_cudadp bfs_cudadp.cu
+nvcc -O3 -arch=sm_89 -rdc=true -o bfs_cudadp bfs_cudadp.cu -lm
 ```
 
 **Como executar**:
