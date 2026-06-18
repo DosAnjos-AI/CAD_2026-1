@@ -122,6 +122,14 @@ processar_algoritmo() {
     done
 }
 
+# Sanidade dos binarios antes do benchmark (nao aborta em caso de falha)
+log_msg "Executando sanidade antes do benchmark..."
+bash sanity_check.sh
+if grep -q "|0|" results/sanity_check.csv; then
+    log_msg "[AVISO] Falhas detectadas na sanidade -- verifique sanity_check.csv"
+    log_msg "[AVISO] Continuando o benchmark mesmo assim..."
+fi
+
 # Ordem de execucao (Maquina A): bitonic_sort -> merge_sort -> bfs
 # Sleep de 3s entre algoritmos distintos para isolamento termico.
 processar_algoritmo "bitonic_sort" "bitonic" "bitonic_sort" "$TAMANHOS_VETOR"

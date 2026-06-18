@@ -87,14 +87,15 @@ static void gerar_vetor(int32_t *arr, int n, const char *cenario) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 3 || argc > 4) {
-        fprintf(stderr, "Uso: %s <N> <cenario> [iteracoes]\n", argv[0]);
+    if (argc < 3 || argc > 5) {
+        fprintf(stderr, "Uso: %s <N> <cenario> [iteracoes] [warmup]\n", argv[0]);
         return 1;
     }
 
     int n = atoi(argv[1]);
     const char *cenario = argv[2];
-    int iteracoes = (argc == 4) ? atoi(argv[3]) : 5;
+    int iteracoes = (argc >= 4) ? atoi(argv[3]) : 5;
+    int warmup = (argc == 5) ? atoi(argv[4]) : 1;
 
     if (strcmp(cenario, "ordenado") != 0 && strcmp(cenario, "invertido") != 0) {
         fprintf(stderr, "Erro: cenario deve ser 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
@@ -138,8 +139,8 @@ int main(int argc, char *argv[]) {
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
 
-    /* 1 execucao de warmup, sem saida */
-    for (int w = 0; w < 1; w++) {
+    /* Execucoes de warmup (default 1), sem saida */
+    for (int w = 0; w < warmup; w++) {
         gerar_vetor(arr, n, cenario);
 
         cudaMemcpy(d_arr, arr, (size_t)n * sizeof(int32_t), cudaMemcpyHostToDevice);

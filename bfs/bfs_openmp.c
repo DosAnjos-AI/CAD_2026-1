@@ -160,14 +160,15 @@ static void bfs_openmp(const int32_t *row_ptr, const int32_t *col_idx, int32_t v
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 3 || argc > 4) {
-        fprintf(stderr, "Uso: %s <V> <cenario> [iteracoes]\n", argv[0]);
+    if (argc < 3 || argc > 5) {
+        fprintf(stderr, "Uso: %s <V> <cenario> [iteracoes] [warmup]\n", argv[0]);
         return 1;
     }
 
     int32_t v = atoi(argv[1]);
     const char *cenario = argv[2];
-    int iteracoes = (argc == 4) ? atoi(argv[3]) : 5;
+    int iteracoes = (argc >= 4) ? atoi(argv[3]) : 5;
+    int warmup = (argc == 5) ? atoi(argv[4]) : 1;
 
     if (strcmp(cenario, "ordenado") != 0 && strcmp(cenario, "invertido") != 0) {
         fprintf(stderr, "Erro: cenario deve ser 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
@@ -208,8 +209,8 @@ int main(int argc, char *argv[]) {
     free(col_idx);
     col_idx = NULL;
 
-    /* 1 execucao de warmup, sem saida */
-    for (int w = 0; w < 1; w++) {
+    /* Execucoes de warmup (default 1), sem saida */
+    for (int w = 0; w < warmup; w++) {
         gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
         bfs_openmp(row_ptr, col_idx, v, 0, dist, frontier, next);
         free(col_idx);
