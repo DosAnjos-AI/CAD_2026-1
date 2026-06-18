@@ -105,17 +105,17 @@ executar() {
 # ---------------------------------------------------------------------------
 # Tamanhos por categoria de algoritmo
 # ---------------------------------------------------------------------------
-TAMANHOS_VETOR="1024 4096 16384 65536 262144 1048576 4194304 16777216 67108864"
-TAMANHOS_BFS="1024 4096 16384 65536"
+TAMANHOS_VETOR="67108864 16777216 4194304 1048576 262144 65536 16384 4096 1024"
+TAMANHOS_BFS="65536 16384 4096 1024"
 
 # ---------------------------------------------------------------------------
-# Loop principal: para cada algoritmo, percorre cenario -> api -> tamanhos crescentes
+# Loop principal: para cada algoritmo, percorre cenario -> api -> tamanhos decrescentes
 # ---------------------------------------------------------------------------
 processar_algoritmo() {
     local dir=$1 prefixo=$2 algo_csv=$3 tamanhos=$4
     local cenario api tamanho
     for cenario in $CENARIOS; do
-        for api in cpu openmp cuda cudadp; do
+        for api in cudadp cuda openmp cpu; do
             for tamanho in $tamanhos; do
                 executar "${dir}/${prefixo}_${api}" "$algo_csv" "$api" "$cenario" "$tamanho"
             done
