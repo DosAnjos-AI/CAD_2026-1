@@ -144,8 +144,8 @@ int main(int argc, char *argv[]) {
 
     int32_t v = atoi(argv[1]);
     const char *cenario = argv[2];
-    int iteracoes = (argc >= 4) ? atoi(argv[3]) : 10;
-    int warmup = (argc == 5) ? atoi(argv[4]) : 3;
+    int iteracoes = (argc >= 4) ? atoi(argv[3]) : 5;
+    int warmup = (argc == 5) ? atoi(argv[4]) : 1;
 
     if (strcmp(cenario, "aleatorio") != 0 && strcmp(cenario, "ordenado") != 0 &&
         strcmp(cenario, "invertido") != 0) {
@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
     free(col_idx);
     col_idx = NULL;
 
-    /* Execucoes de warmup (default 3), sem saida */
+    /* Execucoes de warmup (default 1), sem saida */
     for (int w = 0; w < warmup; w++) {
         gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
         bfs(row_ptr, col_idx, v, 0, dist, frontier, next);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
         double soma = 0.0;
         int corretude = 1;
 
-        for (int exec = 0; exec < 10; exec++) {
+        for (int exec = 0; exec < 5; exec++) {
             gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
 
             struct timespec t0, t1;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
             col_idx = NULL;
         }
 
-        double tempo_s = soma / 10.0;
+        double tempo_s = soma / 5.0;
 
         char tempo_str[64];
         snprintf(tempo_str, sizeof(tempo_str), "%.6f", tempo_s);
