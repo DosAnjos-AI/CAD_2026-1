@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     }
 
     int32_t v = atoi(argv[1]);
-    int iteracoes = (argc == 3) ? atoi(argv[2]) : 10;
+    int iteracoes = (argc == 3) ? atoi(argv[2]) : 5;
 
     if (v <= 0) {
         fprintf(stderr, "Erro: V deve ser positivo (recebido: %d)\n", v);
@@ -187,8 +187,8 @@ int main(int argc, char *argv[]) {
 
     int32_t um = 1;
 
-    /* 3 execucoes de warmup, sem saida */
-    for (int w = 0; w < 3; w++) {
+    /* 1 execucao de warmup, sem saida */
+    for (int w = 0; w < 1; w++) {
         gerar_grafo_csr(v, row_ptr, &col_idx);
         cudaMemcpy(d_row_ptr, row_ptr, (size_t)(v + 1) * sizeof(int32_t), cudaMemcpyHostToDevice);
         cudaMemcpy(d_col_idx, col_idx, (size_t)e_total * sizeof(int32_t), cudaMemcpyHostToDevice);
@@ -221,7 +221,7 @@ int main(int argc, char *argv[]) {
         double soma = 0.0;
         int corretude = 1;
 
-        for (int exec = 0; exec < 10; exec++) {
+        for (int exec = 0; exec < 5; exec++) {
             gerar_grafo_csr(v, row_ptr, &col_idx);
             cudaMemcpy(d_row_ptr, row_ptr, (size_t)(v + 1) * sizeof(int32_t), cudaMemcpyHostToDevice);
             cudaMemcpy(d_col_idx, col_idx, (size_t)e_total * sizeof(int32_t), cudaMemcpyHostToDevice);
@@ -270,7 +270,7 @@ int main(int argc, char *argv[]) {
             col_idx = NULL;
         }
 
-        double tempo_s = soma / 10.0;
+        double tempo_s = soma / 5.0;
 
         char tempo_str[64];
         snprintf(tempo_str, sizeof(tempo_str), "%.6f", tempo_s);
@@ -283,6 +283,7 @@ int main(int argc, char *argv[]) {
 
         printf("bfs|cuda|aleatorio|%d|%d|%s|%d|256x%d\n",
                v, iter, tempo_str, corretude, blocos);
+        fflush(stdout);
     }
 
     cudaEventDestroy(start);

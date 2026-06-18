@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
     }
 
     int32_t v = atoi(argv[1]);
-    int iteracoes = (argc == 3) ? atoi(argv[2]) : 10;
+    int iteracoes = (argc == 3) ? atoi(argv[2]) : 5;
 
     if (v <= 0) {
         fprintf(stderr, "Erro: V deve ser positivo (recebido: %d)\n", v);
@@ -201,8 +201,8 @@ int main(int argc, char *argv[]) {
     free(col_idx);
     col_idx = NULL;
 
-    /* 3 execucoes de warmup, sem saida */
-    for (int w = 0; w < 3; w++) {
+    /* 1 execucao de warmup, sem saida */
+    for (int w = 0; w < 1; w++) {
         gerar_grafo_csr(v, row_ptr, &col_idx);
         bfs_openmp(row_ptr, col_idx, v, 0, dist, frontier, next);
         free(col_idx);
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
         double soma = 0.0;
         int corretude = 1;
 
-        for (int exec = 0; exec < 10; exec++) {
+        for (int exec = 0; exec < 5; exec++) {
             gerar_grafo_csr(v, row_ptr, &col_idx);
 
             struct timespec t0, t1;
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
             col_idx = NULL;
         }
 
-        double tempo_s = soma / 10.0;
+        double tempo_s = soma / 5.0;
 
         char tempo_str[64];
         snprintf(tempo_str, sizeof(tempo_str), "%.6f", tempo_s);
@@ -249,6 +249,7 @@ int main(int argc, char *argv[]) {
 
         printf("bfs|openmp|aleatorio|%d|%d|%s|%d|%dx1\n",
                v, iter, tempo_str, corretude, omp_get_max_threads());
+        fflush(stdout);
     }
 
     free(row_ptr);
