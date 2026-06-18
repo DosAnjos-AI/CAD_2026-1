@@ -32,14 +32,31 @@ static int cmp_int32(const void *a, const void *b) {
     return (va > vb) - (va < vb);
 }
 
+/* Preenche arr conforme o cenario: crescente (ordenado) ou decrescente (invertido) */
+static void gerar_vetor(int32_t *arr, int n, const char *cenario) {
+    if (strcmp(cenario, "ordenado") == 0) {
+        for (int i = 0; i < n; i++)
+            arr[i] = i;
+    } else {
+        for (int i = 0; i < n; i++)
+            arr[i] = n - 1 - i;
+    }
+}
+
 int main(int argc, char *argv[]) {
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Uso: %s <N> [iteracoes]\n", argv[0]);
+    if (argc < 3 || argc > 4) {
+        fprintf(stderr, "Uso: %s <N> <cenario> [iteracoes]\n", argv[0]);
         return 1;
     }
 
     int n = atoi(argv[1]);
-    int iteracoes = (argc == 3) ? atoi(argv[2]) : 10;
+    const char *cenario = argv[2];
+    int iteracoes = (argc == 4) ? atoi(argv[3]) : 5;
+
+    if (strcmp(cenario, "ordenado") != 0 && strcmp(cenario, "invertido") != 0) {
+        fprintf(stderr, "Erro: cenario deve ser 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
+        return 1;
+    }
 
     if (n <= 0 || (n & (n - 1)) != 0) {
         fprintf(stderr, "Erro: N deve ser potencia de 2 (recebido: %d)\n", n);
@@ -60,11 +77,9 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    /* 3 execucoes de warmup, sem saida */
-    for (int w = 0; w < 3; w++) {
-        srand(42);
-        for (int i = 0; i < n; i++)
-            arr[i] = rand();
+    /* 1 execucao de warmup, sem saida */
+    for (int w = 0; w < 1; w++) {
+        gerar_vetor(arr, n, cenario);
         bitonic_sort(arr, n);
     }
 
@@ -72,10 +87,8 @@ int main(int argc, char *argv[]) {
         double soma = 0.0;
         int corretude = 1;
 
-        for (int exec = 0; exec < 10; exec++) {
-            srand(42);
-            for (int i = 0; i < n; i++)
-                arr[i] = rand();
+        for (int exec = 0; exec < 4; exec++) {
+            gerar_vetor(arr, n, cenario);
 
             if (exec == 0) {
                 memcpy(ref, arr, (size_t)n * sizeof(int32_t));
@@ -99,7 +112,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        double tempo_s = soma / 10.0;
+        double tempo_s = soma / 4.0;
 
         char tempo_str[64];
         snprintf(tempo_str, sizeof(tempo_str), "%.6f", tempo_s);
@@ -110,8 +123,9 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        printf("bitonic_sort|cpu|aleatorio|%d|%d|%s|%d|1x1\n",
-               n, iter, tempo_str, corretude);
+        printf("bitonic_sort|cpu|%s|%d|%d|%s|%d|1x1\n",
+               cenario, n, iter, tempo_str, corretude);
+        fflush(stdout);
     }
 
     free(arr);

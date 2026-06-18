@@ -6,14 +6,16 @@
 
 #define BLOCK_SIZE 256
 
-/* Gera grafo Erdos-Renyi nao-dirigido em formato CSR.
- * Para cada par (u, w) com u < w, aresta existe com probabilidade p = 16.0/V.
+/* Gera grafo CSR nao-dirigido conforme o cenario:
+ *   ordenado  -> estrela: vertice 0 ligado a todos os demais (1 nivel BFS)
+ *   invertido -> cadeia: 0-1-2-...-(V-1) (V-1 niveis BFS, pior caso)
  * Construcao em duas passagens: 1) conta grau de cada vertice, 2) preenche col_idx.
  * Aloca *col_idx_out internamente; quem chamar deve liberar o ponteiro retornado.
- * Retorna o numero total de arestas (contando as duas direcoes).
+ * Grafos deterministicos, sem rand. Retorna o numero total de arestas (duas direcoes).
  * Identica ao bfs_cpu.c. */
-static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_idx_out) {
-    double p = 16.0 / (double)v_count;
+static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_idx_out,
+                                const char *cenario) {
+    int estrela = (strcmp(cenario, "ordenado") == 0);
 
     int32_t *grau = (int32_t *)calloc((size_t)v_count, sizeof(int32_t));
     if (!grau) {
@@ -21,15 +23,13 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
         exit(1);
     }
 
-    srand(42);
-    for (int32_t u = 0; u < v_count; u++) {
-        for (int32_t w = u + 1; w < v_count; w++) {
-            double r = (double)rand() / ((double)RAND_MAX + 1.0);
-            if (r < p) {
-                grau[u]++;
-                grau[w]++;
-            }
-        }
+    if (estrela) {
+        grau[0] = v_count - 1;
+        for (int32_t i = 1; i < v_count; i++)
+            grau[i] = 1;
+    } else {
+        for (int32_t i = 0; i < v_count; i++)
+            grau[i] = (i == 0 || i == v_count - 1) ? 1 : 2;
     }
 
     row_ptr[0] = 0;
@@ -45,14 +45,15 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
     }
     memcpy(offset, row_ptr, (size_t)v_count * sizeof(int32_t));
 
-    srand(42);
-    for (int32_t u = 0; u < v_count; u++) {
-        for (int32_t w = u + 1; w < v_count; w++) {
-            double r = (double)rand() / ((double)RAND_MAX + 1.0);
-            if (r < p) {
-                col_idx[offset[u]++] = w;
-                col_idx[offset[w]++] = u;
-            }
+    if (estrela) {
+        for (int32_t i = 1; i < v_count; i++) {
+            col_idx[offset[0]++] = i;
+            col_idx[offset[i]++] = 0;
+        }
+    } else {
+        for (int32_t i = 0; i < v_count - 1; i++) {
+            col_idx[offset[i]++] = i + 1;
+            col_idx[offset[i + 1]++] = i;
         }
     }
 
@@ -120,13 +121,19 @@ __global__ void bfs_kernel(
 }
 
 int main(int argc, char *argv[]) {
-    if (argc < 2 || argc > 3) {
-        fprintf(stderr, "Uso: %s <V> [iteracoes]\n", argv[0]);
+    if (argc < 3 || argc > 4) {
+        fprintf(stderr, "Uso: %s <V> <cenario> [iteracoes]\n", argv[0]);
         return 1;
     }
 
     int32_t v = atoi(argv[1]);
-    int iteracoes = (argc == 3) ? atoi(argv[2]) : 10;
+    const char *cenario = argv[2];
+    int iteracoes = (argc == 4) ? atoi(argv[3]) : 5;
+
+    if (strcmp(cenario, "ordenado") != 0 && strcmp(cenario, "invertido") != 0) {
+        fprintf(stderr, "Erro: cenario deve ser 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
+        return 1;
+    }
 
     if (v <= 0) {
         fprintf(stderr, "Erro: V deve ser positivo (recebido: %d)\n", v);
@@ -157,10 +164,10 @@ int main(int argc, char *argv[]) {
     }
 
     /* Oraculo: BFS sequencial executado uma vez antes do loop de medicao.
-     * A geracao do grafo e deterministica (srand(42) reiniciado a cada
-     * chamada), entao e_total e o conteudo de col_idx sao identicos em
-     * todas as regeneracoes seguintes. */
-    int32_t e_total = gerar_grafo_csr(v, row_ptr, &col_idx);
+     * A geracao do grafo e deterministica (grafo estrela/cadeia sem rand),
+     * entao e_total e o conteudo de col_idx sao identicos em todas as
+     * regeneracoes seguintes. */
+    int32_t e_total = gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
     bfs_seq(row_ptr, col_idx, v, 0, dist_ref, frontier_host, next_host);
     free(col_idx);
     col_idx = NULL;
@@ -187,9 +194,9 @@ int main(int argc, char *argv[]) {
 
     int32_t um = 1;
 
-    /* 3 execucoes de warmup, sem saida */
-    for (int w = 0; w < 3; w++) {
-        gerar_grafo_csr(v, row_ptr, &col_idx);
+    /* 1 execucao de warmup, sem saida */
+    for (int w = 0; w < 1; w++) {
+        gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
         cudaMemcpy(d_row_ptr, row_ptr, (size_t)(v + 1) * sizeof(int32_t), cudaMemcpyHostToDevice);
         cudaMemcpy(d_col_idx, col_idx, (size_t)e_total * sizeof(int32_t), cudaMemcpyHostToDevice);
 
@@ -221,8 +228,8 @@ int main(int argc, char *argv[]) {
         double soma = 0.0;
         int corretude = 1;
 
-        for (int exec = 0; exec < 10; exec++) {
-            gerar_grafo_csr(v, row_ptr, &col_idx);
+        for (int exec = 0; exec < 4; exec++) {
+            gerar_grafo_csr(v, row_ptr, &col_idx, cenario);
             cudaMemcpy(d_row_ptr, row_ptr, (size_t)(v + 1) * sizeof(int32_t), cudaMemcpyHostToDevice);
             cudaMemcpy(d_col_idx, col_idx, (size_t)e_total * sizeof(int32_t), cudaMemcpyHostToDevice);
 
@@ -270,7 +277,7 @@ int main(int argc, char *argv[]) {
             col_idx = NULL;
         }
 
-        double tempo_s = soma / 10.0;
+        double tempo_s = soma / 4.0;
 
         char tempo_str[64];
         snprintf(tempo_str, sizeof(tempo_str), "%.6f", tempo_s);
@@ -281,8 +288,9 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        printf("bfs|cuda|aleatorio|%d|%d|%s|%d|256x%d\n",
-               v, iter, tempo_str, corretude, blocos);
+        printf("bfs|cuda|%s|%d|%d|%s|%d|256x%d\n",
+               cenario, v, iter, tempo_str, corretude, blocos);
+        fflush(stdout);
     }
 
     cudaEventDestroy(start);
