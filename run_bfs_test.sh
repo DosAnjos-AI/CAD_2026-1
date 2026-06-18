@@ -61,7 +61,7 @@ combinacao_completa() {
     local algo=$1 api=$2 tamanho=$3
     local count
     count=$(grep -c "^${algo}|${api}|aleatorio|${tamanho}|" "$CSV" 2>/dev/null) || count=0
-    [ "$count" -ge 10 ]
+    [ "$count" -ge 5 ]
 }
 
 limpar_parcial() {
