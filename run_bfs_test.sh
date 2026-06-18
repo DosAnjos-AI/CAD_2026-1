@@ -41,9 +41,10 @@ compilar() {
     fi
 }
 
-compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c
-compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu
-compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu
+compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c -lm
+compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c -lm
+compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu -lm
+compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu -lm
 
 # ---------------------------------------------------------------------------
 # Inicializacao do CSV de resultados
@@ -58,49 +59,52 @@ fi
 # Funcoes de controle de skip por combinacao completa
 # ---------------------------------------------------------------------------
 combinacao_completa() {
-    local algo=$1 api=$2 tamanho=$3
+    local algo=$1 api=$2 cenario=$3 tamanho=$4
     local count
-    count=$(grep -c "^${algo}|${api}|aleatorio|${tamanho}|" "$CSV" 2>/dev/null) || count=0
+    count=$(grep -c "^${algo}|${api}|${cenario}|${tamanho}|" "$CSV" 2>/dev/null) || count=0
     [ "$count" -ge 5 ]
 }
 
 limpar_parcial() {
-    local algo=$1 api=$2 tamanho=$3
+    local algo=$1 api=$2 cenario=$3 tamanho=$4
     local tmp
     tmp=$(mktemp)
-    grep -v "^${algo}|${api}|aleatorio|${tamanho}|" "$CSV" > "$tmp"
+    grep -v "^${algo}|${api}|${cenario}|${tamanho}|" "$CSV" > "$tmp"
     mv "$tmp" "$CSV"
 }
 
 executar() {
-    local binario=$1 algo=$2 api=$3 tamanho=$4
+    local binario=$1 algo=$2 api=$3 cenario=$4 tamanho=$5
     if [ ! -f "$binario" ]; then
         log_msg "[ERRO] Binario nao encontrado: $binario"
         return
     fi
-    if combinacao_completa "$algo" "$api" "$tamanho"; then
-        log_msg "SKIP ${algo}|${api}|${tamanho} (completo)"
+    if combinacao_completa "$algo" "$api" "$cenario" "$tamanho"; then
+        log_msg "SKIP ${algo}|${api}|${cenario}|${tamanho} (completo)"
         return
     fi
-    limpar_parcial "$algo" "$api" "$tamanho"
-    log_msg "Executando ${algo}|${api}|${tamanho}"
-    "$binario" "$tamanho" >> "$CSV"
+    limpar_parcial "$algo" "$api" "$cenario" "$tamanho"
+    log_msg "Executando ${algo}|${api}|${cenario}|${tamanho}"
+    "$binario" "$tamanho" "$cenario" >> "$CSV"
 }
 
 # ---------------------------------------------------------------------------
-# Tamanhos do BFS para o teste (2^10 a 2^18)
+# Tamanhos e cenarios do BFS para o teste (2^10 a 2^24)
 # ---------------------------------------------------------------------------
-TAMANHOS_BFS="1024 4096 16384 65536 262144"
+TAMANHOS_BFS="1024 4096 16384 65536 262144 1048576 4194304 16777216"
+CENARIOS="aleatorio ordenado invertido"
 
 # ---------------------------------------------------------------------------
-# Loop principal: para o BFS, percorre api -> tamanhos crescentes
+# Loop principal: para o BFS, percorre api -> cenario -> tamanhos crescentes
 # ---------------------------------------------------------------------------
 processar_algoritmo() {
     local dir=$1 prefixo=$2 algo_csv=$3 tamanhos=$4
-    local api tamanho
-    for api in openmp cuda cudadp; do
-        for tamanho in $tamanhos; do
-            executar "${dir}/${prefixo}_${api}" "$algo_csv" "$api" "$tamanho"
+    local api cenario tamanho
+    for api in cpu openmp cuda cudadp; do
+        for cenario in $CENARIOS; do
+            for tamanho in $tamanhos; do
+                executar "${dir}/${prefixo}_${api}" "$algo_csv" "$api" "$cenario" "$tamanho"
+            done
         done
     done
 }

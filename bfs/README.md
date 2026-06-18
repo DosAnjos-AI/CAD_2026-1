@@ -8,10 +8,22 @@ distância 2, e assim por diante, até esgotar os vértices alcançáveis.
 Complexidade O(V+E) — cada vértice e cada aresta são examinados no máximo uma
 vez.
 
-O grafo usado é Erdős–Rényi não-dirigido com grau médio 16: para cada par
-`(u, w)` com `u < w`, a aresta existe com probabilidade `p = 16.0/V`,
-testada com `rand()` sob `srand(42)` — mesma semente em todas as APIs,
-garantindo o mesmo grafo entre execuções e entre implementações.
+O grafo é construído por `gerar_grafo_csr()` conforme o cenário recebido
+como argumento:
+
+- `aleatorio`: Erdős–Rényi não-dirigido com grau médio 16 (aresta com
+  probabilidade `p = 16.0/V`). Gerado por **amostragem geométrica
+  (Batagelj–Brandes)**: em vez de testar todos os `O(V²)` pares, salta
+  diretamente para a próxima aresta sorteando o intervalo a partir de uma
+  distribuição geométrica (`skip = log(1-r)/log(1-p)`), resultando em custo
+  `O(V + E)`. Isso removeu o gargalo quadrático que inviabilizava os
+  tamanhos grandes (o teste de `V=262144` caía de ~26 min para frações de
+  segundo). Usa `srand(42)` — mesma semente em todas as APIs.
+- `ordenado`: grafo estrela — vértice 0 ligado a todos os demais. BFS
+  resolve em 1 nível (melhor caso de profundidade).
+- `invertido`: grafo cadeia — `0–1–2–…–(V-1)`. BFS percorre `V-1` níveis
+  (pior caso de profundidade). Estrela e cadeia são determinísticos, sem
+  `rand()`.
 
 Representação: CSR (Compressed Sparse Row), com `row_ptr[V+1]` e
 `col_idx[E]`, ambos `int32_t`. A fonte é sempre o vértice 0.
@@ -36,13 +48,15 @@ buffer intermediário de arestas.
 
 **Como compilar**:
 ```bash
-gcc -O3 -march=native -o bfs_cpu bfs_cpu.c
+gcc -O3 -march=native -o bfs_cpu bfs_cpu.c -lm
 ```
+O `-lm` é necessário por causa do `log()` usado na amostragem geométrica.
 
 **Como executar**:
 ```bash
-./bfs_cpu V [iteracoes]
+./bfs_cpu V <cenario> [iteracoes] [warmup]
 ```
+`cenario` ∈ `aleatorio | ordenado | invertido`.
 
 **Saída esperada**:
 ```
@@ -72,12 +86,12 @@ final da região `parallel`.
 
 **Como compilar**:
 ```bash
-gcc -O3 -march=native -fopenmp -DNUM_THREADS=$(nproc) -o bfs_openmp bfs_openmp.c
+gcc -O3 -march=native -fopenmp -DNUM_THREADS=$(nproc) -o bfs_openmp bfs_openmp.c -lm
 ```
 
 **Como executar**:
 ```bash
-./bfs_openmp V [iteracoes]
+./bfs_openmp V <cenario> [iteracoes] [warmup]
 ```
 
 **Saída esperada**:
@@ -106,12 +120,12 @@ primeira posição (`dist[0] = 0`, fonte sempre vértice 0).
 
 **Como compilar**:
 ```bash
-nvcc -O3 -arch=sm_89 -o bfs_cuda bfs_cuda.cu
+nvcc -O3 -arch=sm_89 -o bfs_cuda bfs_cuda.cu -lm
 ```
 
 **Como executar**:
 ```bash
-./bfs_cuda V [iteracoes]
+./bfs_cuda V <cenario> [iteracoes] [warmup]
 ```
 
 **Saída esperada**:
@@ -143,12 +157,12 @@ fingir uma medida de paralelismo que não existe.
 
 **Como compilar**:
 ```bash
-nvcc -O3 -arch=sm_89 -rdc=true -o bfs_cudadp bfs_cudadp.cu
+nvcc -O3 -arch=sm_89 -rdc=true -o bfs_cudadp bfs_cudadp.cu -lm
 ```
 
 **Como executar**:
 ```bash
-./bfs_cudadp V [iteracoes]
+./bfs_cudadp V <cenario> [iteracoes] [warmup]
 ```
 
 **Saída esperada**:
@@ -160,14 +174,15 @@ bfs|cudadp|aleatorio|1048576|1|0,015234|1|1x1_dp
 
 **Construção CSR em duas passagens com replay de `srand(42)`**: as quatro
 implementações geram o grafo chamando `gerar_grafo_csr()` antes de cada
-execução (warmup e medida), e essa função reinicia `srand(42)` no começo de
-cada uma das suas duas passagens internas. A primeira passagem só conta grau
-por vértice para montar `row_ptr`; a segunda repete exatamente a mesma
-sequência de `rand()` para preencher `col_idx` nas posições corretas. O
-resultado é determinístico e idêntico em toda regeneração, sem precisar
-manter uma lista de arestas em buffer intermediário entre as duas passagens
-— o custo é gerar os mesmos números aleatórios duas vezes por execução, em
-troca de não alocar O(E) de memória extra.
+execução (warmup e medida). A primeira passagem só conta grau por vértice
+para montar `row_ptr`; a segunda preenche `col_idx` nas posições corretas,
+sem manter uma lista de arestas em buffer intermediário entre as passagens.
+No cenário `aleatorio`, cada passagem reinicia `srand(42)` e repete
+exatamente a mesma sequência de saltos geométricos (Batagelj–Brandes), de
+forma determinística e idêntica em toda regeneração — o custo é gerar os
+mesmos números aleatórios duas vezes por execução, em troca de não alocar
+O(E) de memória extra. Nos cenários `ordenado` (estrela) e `invertido`
+(cadeia) o grafo é determinístico e dispensa `rand()`.
 
 **OpenMP — `LOCAL_BUFFER_SIZE = 1024` em vez de buffer de tamanho V**: um
 buffer por thread do tamanho do grafo seria correto, mas desperdiçaria
