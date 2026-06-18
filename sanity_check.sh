@@ -1,7 +1,8 @@
 #!/bin/bash
 # Script de sanidade da branch CAD_2026_v3_cenarios.
 # Compila os 12 binarios (bitonic, merge, bfs) e executa cada um com tamanho
-# minimo, 1 iteracao e 0 warmup, para ambos os cenarios (ordenado e invertido).
+# minimo, 1 iteracao e 0 warmup, nos cenarios ordenado e invertido; o BFS roda
+# tambem no cenario aleatorio (bitonic/merge nao o suportam).
 # Registra o resultado em results/sanity_check.csv e reporta o total de
 # combinacoes que passaram (corretude=1) e falharam (corretude=0 ou erro).
 #
@@ -59,10 +60,10 @@ compilar "merge_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREA
 compilar "merge_cuda" nvcc -O3 -arch="${ARCH}" -o merge_sort/merge_cuda merge_sort/merge_cuda.cu
 compilar "merge_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o merge_sort/merge_cudadp merge_sort/merge_cudadp.cu
 
-compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c
-compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c
-compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu
-compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu
+compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c -lm
+compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c -lm
+compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu -lm
+compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu -lm
 
 # ---------------------------------------------------------------------------
 # Inicializacao do CSV de sanidade (sempre recriado do zero)
@@ -113,6 +114,12 @@ for cenario in $CENARIOS; do
     for api in cpu openmp cuda cudadp; do
         testar "bfs/bfs_${api}" "bfs" "$api" "$cenario" "$N_BFS"
     done
+done
+
+# O BFS suporta tambem o cenario aleatorio (Erdos-Renyi via Batagelj-Brandes);
+# bitonic/merge so possuem ordenado/invertido, por isso o aleatorio fica a parte.
+for api in cpu openmp cuda cudadp; do
+    testar "bfs/bfs_${api}" "bfs" "$api" "aleatorio" "$N_BFS"
 done
 
 # ---------------------------------------------------------------------------

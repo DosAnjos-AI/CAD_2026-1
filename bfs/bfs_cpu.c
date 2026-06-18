@@ -3,16 +3,26 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
 /* Gera grafo CSR nao-dirigido conforme o cenario:
+ *   aleatorio -> Erdos-Renyi grau medio 16 via amostragem geometrica
+ *                (Batagelj-Brandes): em vez de testar todos os O(V^2) pares,
+ *                salta direto para a proxima aresta sorteando o intervalo de
+ *                uma distribuicao geometrica, resultando em custo O(V + E).
+ *                Para cada par (v, w) com w < v, aresta com prob p = 16.0/V.
+ *                As duas passagens reiniciam srand(42) e geram o mesmo grafo.
  *   ordenado  -> estrela: vertice 0 ligado a todos os demais (1 nivel BFS)
  *   invertido -> cadeia: 0-1-2-...-(V-1) (V-1 niveis BFS, pior caso)
  * Construcao em duas passagens: 1) conta grau de cada vertice, 2) preenche col_idx.
  * Aloca *col_idx_out internamente; quem chamar deve liberar o ponteiro retornado.
- * Grafos deterministicos, sem rand. Retorna o numero total de arestas (duas direcoes). */
+ * Retorna o numero total de arestas (contando as duas direcoes). */
 static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_idx_out,
                                 const char *cenario) {
+    int aleatorio = (strcmp(cenario, "aleatorio") == 0);
     int estrela = (strcmp(cenario, "ordenado") == 0);
+    double p = 16.0 / (double)v_count;
+    double log_um_menos_p = log(1.0 - p);
 
     int32_t *grau = calloc((size_t)v_count, sizeof(int32_t));
     if (!grau) {
@@ -20,7 +30,24 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
         exit(1);
     }
 
-    if (estrela) {
+    /* Passagem 1: conta o grau de cada vertice */
+    if (aleatorio) {
+        srand(42);
+        int32_t v = 1;
+        int32_t w = -1;
+        while (v < v_count) {
+            double r = (double)rand() / ((double)RAND_MAX + 1.0);
+            w += 1 + (int32_t)(log(1.0 - r) / log_um_menos_p);
+            while (w >= v && v < v_count) {
+                w -= v;
+                v++;
+            }
+            if (v < v_count) {
+                grau[v]++;
+                grau[w]++;
+            }
+        }
+    } else if (estrela) {
         grau[0] = v_count - 1;
         for (int32_t i = 1; i < v_count; i++)
             grau[i] = 1;
@@ -42,7 +69,24 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
     }
     memcpy(offset, row_ptr, (size_t)v_count * sizeof(int32_t));
 
-    if (estrela) {
+    /* Passagem 2: preenche col_idx com a mesma sequencia de arestas */
+    if (aleatorio) {
+        srand(42);
+        int32_t v = 1;
+        int32_t w = -1;
+        while (v < v_count) {
+            double r = (double)rand() / ((double)RAND_MAX + 1.0);
+            w += 1 + (int32_t)(log(1.0 - r) / log_um_menos_p);
+            while (w >= v && v < v_count) {
+                w -= v;
+                v++;
+            }
+            if (v < v_count) {
+                col_idx[offset[v]++] = w;
+                col_idx[offset[w]++] = v;
+            }
+        }
+    } else if (estrela) {
         for (int32_t i = 1; i < v_count; i++) {
             col_idx[offset[0]++] = i;
             col_idx[offset[i]++] = 0;
@@ -103,8 +147,9 @@ int main(int argc, char *argv[]) {
     int iteracoes = (argc >= 4) ? atoi(argv[3]) : 5;
     int warmup = (argc == 5) ? atoi(argv[4]) : 1;
 
-    if (strcmp(cenario, "ordenado") != 0 && strcmp(cenario, "invertido") != 0) {
-        fprintf(stderr, "Erro: cenario deve ser 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
+    if (strcmp(cenario, "aleatorio") != 0 && strcmp(cenario, "ordenado") != 0 &&
+        strcmp(cenario, "invertido") != 0) {
+        fprintf(stderr, "Erro: cenario deve ser 'aleatorio', 'ordenado' ou 'invertido' (recebido: %s)\n", cenario);
         return 1;
     }
 

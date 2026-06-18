@@ -17,8 +17,11 @@ mkdir -p results
 
 CSV="results/resultados_cenarios.csv"
 
-# Ordem dos cenarios (Maquina B): invertido -> ordenado
+# Ordem dos cenarios (Maquina B): invertido -> ordenado (bitonic/merge)
 CENARIOS="invertido ordenado"
+# O BFS suporta tambem o cenario aleatorio (Erdos-Renyi via Batagelj-Brandes);
+# bitonic/merge so possuem ordenado/invertido, por isso a lista do BFS e separada.
+CENARIOS_BFS="invertido ordenado aleatorio"
 
 # ---------------------------------------------------------------------------
 # Deteccao dinamica de hardware
@@ -55,10 +58,10 @@ compilar "merge_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREA
 compilar "merge_cuda" nvcc -O3 -arch="${ARCH}" -o merge_sort/merge_cuda merge_sort/merge_cuda.cu
 compilar "merge_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o merge_sort/merge_cudadp merge_sort/merge_cudadp.cu
 
-compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c
-compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c
-compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu
-compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu
+compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c -lm
+compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c -lm
+compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu -lm
+compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu -lm
 
 # ---------------------------------------------------------------------------
 # Inicializacao do CSV de resultados
@@ -112,9 +115,9 @@ TAMANHOS_BFS="65536 16384 4096 1024"
 # Loop principal: para cada algoritmo, percorre cenario -> api -> tamanhos decrescentes
 # ---------------------------------------------------------------------------
 processar_algoritmo() {
-    local dir=$1 prefixo=$2 algo_csv=$3 tamanhos=$4
+    local dir=$1 prefixo=$2 algo_csv=$3 tamanhos=$4 cenarios=$5
     local cenario api tamanho
-    for cenario in $CENARIOS; do
+    for cenario in $cenarios; do
         for api in cudadp cuda openmp cpu; do
             for tamanho in $tamanhos; do
                 executar "${dir}/${prefixo}_${api}" "$algo_csv" "$api" "$cenario" "$tamanho"
@@ -125,10 +128,10 @@ processar_algoritmo() {
 
 # Ordem de execucao (Maquina B): bfs -> merge_sort -> bitonic_sort
 # Sleep de 3s entre algoritmos distintos para isolamento termico.
-processar_algoritmo "bfs" "bfs" "bfs" "$TAMANHOS_BFS"
+processar_algoritmo "bfs" "bfs" "bfs" "$TAMANHOS_BFS" "$CENARIOS_BFS"
 sleep 3
-processar_algoritmo "merge_sort" "merge" "merge_sort" "$TAMANHOS_VETOR"
+processar_algoritmo "merge_sort" "merge" "merge_sort" "$TAMANHOS_VETOR" "$CENARIOS"
 sleep 3
-processar_algoritmo "bitonic_sort" "bitonic" "bitonic_sort" "$TAMANHOS_VETOR"
+processar_algoritmo "bitonic_sort" "bitonic" "bitonic_sort" "$TAMANHOS_VETOR" "$CENARIOS"
 
 log_msg "Benchmark de cenarios concluido"
