@@ -2,18 +2,25 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 #include <cuda_runtime.h>
 
 #define BLOCK_SIZE 256
 
-/* Gera grafo Erdos-Renyi nao-dirigido em formato CSR.
- * Para cada par (u, w) com u < w, aresta existe com probabilidade p = 16.0/V.
+/* Gera grafo Erdos-Renyi nao-dirigido em formato CSR usando amostragem
+ * geometrica (Batagelj-Brandes): em vez de testar todos os O(V^2) pares,
+ * salta diretamente para a proxima aresta sorteando o intervalo a partir de
+ * uma distribuicao geometrica, resultando em custo O(V + E).
+ * Para cada par (v, w) com w < v, aresta existe com probabilidade p = 16.0/V.
  * Construcao em duas passagens: 1) conta grau de cada vertice, 2) preenche col_idx.
+ * As duas passagens reiniciam a mesma semente (srand(42)) e geram exatamente
+ * o mesmo conjunto de arestas.
  * Aloca *col_idx_out internamente; quem chamar deve liberar o ponteiro retornado.
  * Retorna o numero total de arestas (contando as duas direcoes).
  * Identica ao bfs_cpu.c. */
 static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_idx_out) {
     double p = 16.0 / (double)v_count;
+    double log_um_menos_p = log(1.0 - p);
 
     int32_t *grau = (int32_t *)calloc((size_t)v_count, sizeof(int32_t));
     if (!grau) {
@@ -21,12 +28,20 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
         exit(1);
     }
 
+    /* Passagem 1: conta o grau de cada vertice */
     srand(42);
-    for (int32_t u = 0; u < v_count; u++) {
-        for (int32_t w = u + 1; w < v_count; w++) {
+    {
+        int32_t v = 1;
+        int32_t w = -1;
+        while (v < v_count) {
             double r = (double)rand() / ((double)RAND_MAX + 1.0);
-            if (r < p) {
-                grau[u]++;
+            w += 1 + (int32_t)(log(1.0 - r) / log_um_menos_p);
+            while (w >= v && v < v_count) {
+                w -= v;
+                v++;
+            }
+            if (v < v_count) {
+                grau[v]++;
                 grau[w]++;
             }
         }
@@ -45,13 +60,21 @@ static int32_t gerar_grafo_csr(int32_t v_count, int32_t *row_ptr, int32_t **col_
     }
     memcpy(offset, row_ptr, (size_t)v_count * sizeof(int32_t));
 
+    /* Passagem 2: preenche col_idx com a mesma sequencia de arestas */
     srand(42);
-    for (int32_t u = 0; u < v_count; u++) {
-        for (int32_t w = u + 1; w < v_count; w++) {
+    {
+        int32_t v = 1;
+        int32_t w = -1;
+        while (v < v_count) {
             double r = (double)rand() / ((double)RAND_MAX + 1.0);
-            if (r < p) {
-                col_idx[offset[u]++] = w;
-                col_idx[offset[w]++] = u;
+            w += 1 + (int32_t)(log(1.0 - r) / log_um_menos_p);
+            while (w >= v && v < v_count) {
+                w -= v;
+                v++;
+            }
+            if (v < v_count) {
+                col_idx[offset[v]++] = w;
+                col_idx[offset[w]++] = v;
             }
         }
     }

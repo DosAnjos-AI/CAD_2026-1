@@ -50,10 +50,10 @@ compilar "merge_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREA
 compilar "merge_cuda" nvcc -O3 -arch="${ARCH}" -o merge_sort/merge_cuda merge_sort/merge_cuda.cu
 compilar "merge_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o merge_sort/merge_cudadp merge_sort/merge_cudadp.cu
 
-compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c
-compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c
-compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu
-compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu
+compilar "bfs_cpu" gcc -O3 -march=native -Wall -Wextra -o bfs/bfs_cpu bfs/bfs_cpu.c -lm
+compilar "bfs_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o bfs/bfs_openmp bfs/bfs_openmp.c -lm
+compilar "bfs_cuda" nvcc -O3 -arch="${ARCH}" -o bfs/bfs_cuda bfs/bfs_cuda.cu -lm
+compilar "bfs_cudadp" nvcc -O3 -arch="${ARCH}" -rdc=true -o bfs/bfs_cudadp bfs/bfs_cudadp.cu -lm
 
 compilar "floyd_cpu" gcc -O3 -march=native -Wall -Wextra -o floyd_warshall/floyd_cpu floyd_warshall/floyd_cpu.c
 compilar "floyd_openmp" gcc -O3 -march=native -fopenmp -Wall -Wextra -DNUM_THREADS="${NTHREADS}" -o floyd_warshall/floyd_openmp floyd_warshall/floyd_openmp.c
