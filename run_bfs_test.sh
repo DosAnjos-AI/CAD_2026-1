@@ -1,7 +1,7 @@
 #!/bin/bash
 # Orquestrador de teste dedicado ao BFS (branch CAD_2026_v3_bfs_test).
 # Compila apenas os binarios BFS (openmp, cuda, cudadp) e executa cada
-# combinacao bfs|api|tamanho, pulando combinacoes ja completas (10 linhas)
+# combinacao bfs|api|tamanho, pulando combinacoes ja completas (5 linhas)
 # no CSV de resultados de teste.
 #
 # Uso: nohup ./run_bfs_test.sh > results/log_bfs_test.txt 2>&1 &
