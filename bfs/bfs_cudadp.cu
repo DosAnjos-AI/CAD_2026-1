@@ -162,8 +162,12 @@ __global__ void bfs_expand(
 }
 
 /* Kernel pai: um thread por vertice. Threads cujo vertice esta na fronteira
- * atual lancam um kernel filho proprio para expandir seus vizinhos,
- * concentrando o paralelismo dinamico nos vertices efetivamente ativos. */
+ * atual expandem seus vizinhos. O paralelismo dinamico (kernel filho) so e
+ * usado para vertices de grau alto, onde ha trabalho suficiente para justificar
+ * o lancamento; vertices de grau baixo expandem inline no proprio thread pai.
+ * Sem esse limiar, um nivel com muitos vertices ativos de grau baixo (ex.: o
+ * nivel 1 do grafo estrela) dispararia um kernel filho por vertice, estourando
+ * o buffer de lancamentos pendentes do runtime de DP e travando a GPU. */
 __global__ void bfs_outer(
     int32_t *dist, int32_t V,
     int32_t *row_ptr, int32_t *col_idx,
@@ -174,12 +178,24 @@ __global__ void bfs_outer(
     if (v >= V || !frontier[v]) return;
 
     frontier[v] = 0;
-    int n_viz = row_ptr[v + 1] - row_ptr[v];
+    int start = row_ptr[v];
+    int end   = row_ptr[v + 1];
+    int n_viz = end - start;
     if (n_viz == 0) return;
 
-    int blocos_filho = (n_viz + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    bfs_expand<<<blocos_filho, BLOCK_SIZE>>>(
-        dist, row_ptr, col_idx, frontier_next, v, nivel, frontier_vazia);
+    if (n_viz > BLOCK_SIZE) {
+        int blocos_filho = (n_viz + BLOCK_SIZE - 1) / BLOCK_SIZE;
+        bfs_expand<<<blocos_filho, BLOCK_SIZE>>>(
+            dist, row_ptr, col_idx, frontier_next, v, nivel, frontier_vazia);
+    } else {
+        for (int k = start; k < end; k++) {
+            int u = col_idx[k];
+            if (atomicCAS(&dist[u], -1, nivel + 1) == -1) {
+                frontier_next[u] = 1;
+                *frontier_vazia = 0;
+            }
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
